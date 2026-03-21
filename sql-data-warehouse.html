@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SQL Data Warehouse Project | Salman Chaudhry</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Lora:ital,wght@0,400;1,400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:#0b0c0e; --surface:#111316; --surface2:#181a1f;
+      --border:rgba(255,255,255,0.07); --amber:#f5a623; --amber-dim:#c47e0e;
+      --teal:#2dd4bf; --text:#e8e6e0; --muted:#6b6b72; --accent-r:#e85d4a;
+      --bronze:#cd7f32; --silver:#a8a9ad; --gold:#ffd700;
+      --font-head:'Syne',sans-serif; --font-mono:'Space Mono',monospace;
+      --font-body:'Lora',serif; --max:1100px; --radius:6px;
+    }
+    html { scroll-behavior: smooth; }
+    body { background:var(--bg); color:var(--text); font-family:var(--font-body); font-size:1.05rem; line-height:1.7; overflow-x:hidden; }
+    ::selection { background:var(--amber); color:#000; }
+    ::-webkit-scrollbar { width:4px; }
+    ::-webkit-scrollbar-track { background:var(--bg); }
+    ::-webkit-scrollbar-thumb { background:var(--amber-dim); border-radius:2px; }
+    body::before { content:''; position:fixed; inset:0; z-index:0; pointer-events:none; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E"); opacity:.025; }
+
+    /* NAV */
+    nav { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:1.2rem 3rem; background:rgba(11,12,14,.88); backdrop-filter:blur(16px); border-bottom:1px solid var(--border); }
+    .nav-logo { font-family:var(--font-mono); font-size:.85rem; color:var(--amber); letter-spacing:.08em; text-decoration:none; }
+    .nav-back { font-family:var(--font-mono); font-size:.78rem; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); text-decoration:none; display:flex; align-items:center; gap:.5rem; transition:color .2s; }
+    .nav-back:hover { color:var(--amber); }
+
+    /* HERO */
+    .project-hero { padding: 9rem 3rem 5rem; max-width:var(--max); margin:0 auto; }
+    .back-link { font-family:var(--font-mono); font-size:.75rem; letter-spacing:.15em; text-transform:uppercase; color:var(--muted); text-decoration:none; display:inline-flex; align-items:center; gap:.5rem; margin-bottom:2rem; transition:color .2s; }
+    .back-link:hover { color:var(--amber); }
+    .project-eyebrow { font-family:var(--font-mono); font-size:.75rem; letter-spacing:.2em; text-transform:uppercase; color:var(--teal); margin-bottom:1rem; display:flex; align-items:center; gap:.6rem; }
+    .project-eyebrow::before { content:''; display:inline-block; width:28px; height:1px; background:var(--teal); }
+    .project-title { font-family:var(--font-head); font-size:clamp(2.2rem,5vw,4rem); font-weight:800; color:#fff; line-height:1.05; letter-spacing:-.02em; margin-bottom:1.5rem; }
+    .project-title span { color:var(--amber); }
+    .project-desc { font-size:1.05rem; color:var(--muted); max-width:650px; line-height:1.85; margin-bottom:2.5rem; }
+
+    .project-meta { display:flex; gap:2rem; flex-wrap:wrap; margin-bottom:3rem; }
+    .meta-item { }
+    .meta-label { font-family:var(--font-mono); font-size:.65rem; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); margin-bottom:.3rem; }
+    .meta-value { font-family:var(--font-mono); font-size:.82rem; color:var(--text); }
+    .meta-value.amber { color:var(--amber); }
+    .meta-value.teal { color:var(--teal); }
+
+    .tag-row { display:flex; gap:.5rem; flex-wrap:wrap; }
+    .tag { font-family:var(--font-mono); font-size:.68rem; letter-spacing:.06em; padding:.28rem .7rem; border-radius:4px; background:var(--surface2); border:1px solid var(--border); color:var(--muted); }
+
+    /* PROGRESS OVERVIEW */
+    .section { padding:3rem 3rem; max-width:var(--max); margin:0 auto; }
+    .section-label { font-family:var(--font-mono); font-size:.72rem; letter-spacing:.2em; text-transform:uppercase; color:var(--amber); margin-bottom:1.5rem; padding-bottom:.6rem; border-bottom:1px solid var(--border); }
+
+    .progress-overview { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:1rem; margin-bottom:3rem; }
+    .prog-card { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:1.4rem 1.2rem; text-align:center; transition:border-color .2s, transform .2s; }
+    .prog-card:hover { border-color:var(--amber); transform:translateY(-2px); }
+    .prog-num { font-family:var(--font-head); font-size:2rem; font-weight:800; display:block; line-height:1; margin-bottom:.4rem; }
+    .prog-num.done { color:var(--teal); }
+    .prog-label { font-family:var(--font-mono); font-size:.65rem; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
+
+    /* OVERALL PROGRESS BAR */
+    .overall-progress { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:1.8rem 2rem; margin-bottom:3rem; }
+    .op-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; }
+    .op-title { font-family:var(--font-head); font-size:1rem; font-weight:700; color:#fff; }
+    .op-pct { font-family:var(--font-mono); font-size:1.2rem; font-weight:700; color:var(--teal); }
+    .op-track { height:10px; background:var(--surface2); border-radius:5px; overflow:hidden; }
+    .op-fill { height:100%; border-radius:5px; background:linear-gradient(90deg, var(--amber-dim), var(--amber), var(--teal)); width:0; transition:width 1.5s cubic-bezier(.4,0,.2,1); }
+
+    /* PIPELINE DIAGRAM */
+    .pipeline { display:flex; align-items:center; gap:0; margin-bottom:3rem; overflow-x:auto; padding-bottom:.5rem; }
+    .pipe-stage { flex-shrink:0; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:1.2rem 1.5rem; min-width:140px; text-align:center; transition:border-color .2s; }
+    .pipe-stage:hover { border-color:var(--amber); }
+    .pipe-stage.done { border-color:rgba(45,212,191,.4); }
+    .pipe-icon { font-size:1.8rem; margin-bottom:.4rem; display:block; }
+    .pipe-name { font-family:var(--font-mono); font-size:.72rem; letter-spacing:.08em; color:var(--text); display:block; margin-bottom:.3rem; }
+    .pipe-status { font-family:var(--font-mono); font-size:.65rem; letter-spacing:.1em; text-transform:uppercase; }
+    .pipe-status.done { color:var(--teal); }
+    .pipe-arrow { font-size:1.5rem; color:var(--muted); padding:0 .3rem; flex-shrink:0; }
+
+    /* EPICS SECTION */
+    .epics-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:1.2rem; }
+
+    .epic-card { background:var(--surface); border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+    .epic-header { padding:1.2rem 1.5rem; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border); }
+    .epic-name { font-family:var(--font-head); font-size:.95rem; font-weight:700; color:#fff; display:flex; align-items:center; gap:.6rem; }
+    .epic-badge { font-family:var(--font-mono); font-size:.65rem; letter-spacing:.1em; text-transform:uppercase; padding:.2rem .6rem; border-radius:4px; }
+    .epic-badge.done { background:rgba(45,212,191,.12); color:var(--teal); border:1px solid rgba(45,212,191,.25); }
+    .epic-tasks { padding:.8rem 1.5rem 1.2rem; }
+    .task-item { display:flex; align-items:flex-start; gap:.75rem; padding:.5rem 0; border-bottom:1px solid rgba(255,255,255,.04); }
+    .task-item:last-child { border-bottom:none; }
+    .task-check { width:18px; height:18px; border-radius:4px; flex-shrink:0; margin-top:.15rem; display:flex; align-items:center; justify-content:center; font-size:.7rem; }
+    .task-check.done { background:rgba(45,212,191,.15); border:1px solid rgba(45,212,191,.35); color:var(--teal); }
+    .task-text { font-size:.85rem; color:var(--muted); line-height:1.5; }
+    .task-text.done { color:var(--text); }
+
+    /* LAYER ARCHITECTURE */
+    .arch-diagram { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1.5rem; margin-bottom:3rem; }
+    .layer-card { border-radius:10px; padding:1.8rem; text-align:center; border:1px solid; }
+    .layer-card.bronze { background:rgba(205,127,50,.08); border-color:rgba(205,127,50,.3); }
+    .layer-card.silver { background:rgba(168,169,173,.08); border-color:rgba(168,169,173,.3); }
+    .layer-card.gold   { background:rgba(255,215,0,.08);   border-color:rgba(255,215,0,.3); }
+    .layer-icon { font-size:2.5rem; margin-bottom:.8rem; display:block; }
+    .layer-name { font-family:var(--font-head); font-size:1.1rem; font-weight:700; margin-bottom:.5rem; }
+    .layer-card.bronze .layer-name { color:var(--bronze); }
+    .layer-card.silver .layer-name { color:var(--silver); }
+    .layer-card.gold   .layer-name { color:var(--gold); }
+    .layer-desc { font-size:.82rem; color:var(--muted); line-height:1.6; }
+
+    /* DIVIDER */
+    hr.section-divider { border:none; border-top:1px solid var(--border); margin:0 3rem; }
+
+    /* FOOTER */
+    footer { border-top:1px solid var(--border); padding:2rem 3rem; display:flex; justify-content:space-between; align-items:center; font-family:var(--font-mono); font-size:.72rem; color:var(--muted); letter-spacing:.06em; }
+    footer a { color:var(--amber); text-decoration:none; }
+
+    /* FADE */
+    .fade-up { opacity:0; transform:translateY(24px); transition:opacity .6s ease,transform .6s ease; }
+    .fade-up.visible { opacity:1; transform:none; }
+    .d1{transition-delay:.05s}.d2{transition-delay:.12s}.d3{transition-delay:.2s}.d4{transition-delay:.28s}
+
+    @media(max-width:768px){
+      nav { padding:1rem 1.5rem; }
+      .project-hero,.section { padding-left:1.5rem; padding-right:1.5rem; }
+      .arch-diagram { grid-template-columns:1fr; }
+      .pipeline { flex-direction:column; align-items:stretch; }
+      .pipe-arrow { transform:rotate(90deg); text-align:center; }
+      footer { flex-direction:column; gap:.5rem; text-align:center; }
+      hr.section-divider { margin:0 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">$ salman.exe</a>
+  <a href="index.html" class="nav-back">← Back to Portfolio</a>
+</nav>
+
+<!-- HERO -->
+<div class="project-hero">
+  <a href="index.html" class="back-link fade-up">← Back to all projects</a>
+  <p class="project-eyebrow fade-up d1">// Data Engineering Project</p>
+  <h1 class="project-title fade-up d2">SQL Data<br><span>Warehouse</span></h1>
+  <p class="project-desc fade-up d3">
+    A full end-to-end Data Warehouse built using SQL Server — following the Medallion Architecture (Bronze → Silver → Gold). This project covers requirements analysis, data architecture design, multi-layer ETL ingestion, data cleansing, integration, and a final Star Schema for analytics-ready reporting.
+  </p>
+
+  <div class="project-meta fade-up d4">
+    <div class="meta-item">
+      <p class="meta-label">Project Type</p>
+      <p class="meta-value amber">Data Engineering</p>
+    </div>
+    <div class="meta-item">
+      <p class="meta-label">Architecture</p>
+      <p class="meta-value teal">Medallion (Bronze/Silver/Gold)</p>
+    </div>
+    <div class="meta-item">
+      <p class="meta-label">Status</p>
+      <p class="meta-value teal">✓ All Phases Complete</p>
+    </div>
+    <div class="meta-item">
+      <p class="meta-label">Tracked In</p>
+      <p class="meta-value">Notion</p>
+    </div>
+  </div>
+
+  <div class="tag-row fade-up d4">
+    <span class="tag">SQL Server</span>
+    <span class="tag">ETL</span>
+    <span class="tag">Data Modeling</span>
+    <span class="tag">Star Schema</span>
+    <span class="tag">Bronze Layer</span>
+    <span class="tag">Silver Layer</span>
+    <span class="tag">Gold Layer</span>
+    <span class="tag">Draw.io</span>
+    <span class="tag">Git</span>
+    <span class="tag">Notion</span>
+    <span class="tag">Data Catalog</span>
+  </div>
+</div>
+
+<hr class="section-divider" />
+
+<!-- PROGRESS OVERVIEW -->
+<div class="section">
+  <p class="section-label fade-up">Project Progress</p>
+
+  <div class="overall-progress fade-up d1">
+    <div class="op-header">
+      <span class="op-title">Overall Completion</span>
+      <span class="op-pct">100%</span>
+    </div>
+    <div class="op-track">
+      <div class="op-fill" id="mainBar"></div>
+    </div>
+  </div>
+
+  <div class="progress-overview">
+    <div class="prog-card fade-up d1">
+      <span class="prog-num done">6</span>
+      <span class="prog-label">Epics Completed</span>
+    </div>
+    <div class="prog-card fade-up d2">
+      <span class="prog-num done">26</span>
+      <span class="prog-label">Tasks Completed</span>
+    </div>
+    <div class="prog-card fade-up d3">
+      <span class="prog-num done">3</span>
+      <span class="prog-label">Data Layers Built</span>
+    </div>
+    <div class="prog-card fade-up d4">
+      <span class="prog-num done">4</span>
+      <span class="prog-label">Git Commits</span>
+    </div>
+  </div>
+</div>
+
+<hr class="section-divider" />
+
+<!-- PIPELINE DIAGRAM -->
+<div class="section">
+  <p class="section-label fade-up">Data Pipeline Architecture</p>
+
+  <div class="pipeline fade-up d1">
+    <div class="pipe-stage done">
+      <span class="pipe-icon">📋</span>
+      <span class="pipe-name">Requirements</span>
+      <span class="pipe-status done">✓ Done</span>
+    </div>
+    <span class="pipe-arrow">→</span>
+    <div class="pipe-stage done">
+      <span class="pipe-icon">🏗️</span>
+      <span class="pipe-name">Architecture Design</span>
+      <span class="pipe-status done">✓ Done</span>
+    </div>
+    <span class="pipe-arrow">→</span>
+    <div class="pipe-stage done">
+      <span class="pipe-icon">🔧</span>
+      <span class="pipe-name">Project Init</span>
+      <span class="pipe-status done">✓ Done</span>
+    </div>
+    <span class="pipe-arrow">→</span>
+    <div class="pipe-stage done" style="border-color:rgba(205,127,50,.4)">
+      <span class="pipe-icon">🥉</span>
+      <span class="pipe-name">Bronze Layer</span>
+      <span class="pipe-status done">✓ Done</span>
+    </div>
+    <span class="pipe-arrow">→</span>
+    <div class="pipe-stage done" style="border-color:rgba(168,169,173,.4)">
+      <span class="pipe-icon">🥈</span>
+      <span class="pipe-name">Silver Layer</span>
+      <span class="pipe-status done">✓ Done</span>
+    </div>
+    <span class="pipe-arrow">→</span>
+    <div class="pipe-stage done" style="border-color:rgba(255,215,0,.4)">
+      <span class="pipe-icon">🥇</span>
+      <span class="pipe-name">Gold Layer</span>
+      <span class="pipe-status done">✓ Done</span>
+    </div>
+  </div>
+</div>
+
+<hr class="section-divider" />
+
+<!-- MEDALLION ARCHITECTURE -->
+<div class="section">
+  <p class="section-label fade-up">Medallion Architecture</p>
+  <div class="arch-diagram">
+    <div class="layer-card bronze fade-up d1">
+      <span class="layer-icon">🥉</span>
+      <p class="layer-name">Bronze Layer</p>
+      <p class="layer-desc">Raw data ingestion from source systems. No transformations — data stored as-is for full traceability. Validated for completeness and schema integrity.</p>
+    </div>
+    <div class="layer-card silver fade-up d2">
+      <span class="layer-icon">🥈</span>
+      <p class="layer-name">Silver Layer</p>
+      <p class="layer-desc">Cleaned and standardized data. Applied data cleansing rules, resolved inconsistencies, and validated correctness. Documented data integration flows.</p>
+    </div>
+    <div class="layer-card gold fade-up d3">
+      <span class="layer-icon">🥇</span>
+      <p class="layer-name">Gold Layer</p>
+      <p class="layer-desc">Analytics-ready Star Schema. Business objects integrated, data catalog created, and dimensional model documented. Ready for BI and reporting tools.</p>
+    </div>
+  </div>
+</div>
+
+<hr class="section-divider" />
+
+<!-- EPIC TASK BREAKDOWN -->
+<div class="section">
+  <p class="section-label fade-up">Epic & Task Breakdown</p>
+  <div class="epics-grid">
+
+    <!-- Requirements Analysis -->
+    <div class="epic-card fade-up d1">
+      <div class="epic-header">
+        <span class="epic-name">📋 Requirements Analysis</span>
+        <span class="epic-badge done">✓ Complete</span>
+      </div>
+      <div class="epic-tasks">
+        <div class="task-item">
+          <div class="task-check done">✓</div>
+          <span class="task-text done">Analyse & Understand the Requirements</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Design Data Architecture -->
+    <div class="epic-card fade-up d2">
+      <div class="epic-header">
+        <span class="epic-name">🏗️ Design Data Architecture</span>
+        <span class="epic-badge done">✓ Complete</span>
+      </div>
+      <div class="epic-tasks">
+        <div class="task-item">
+          <div class="task-check done">✓</div>
+          <span class="task-text done">Choose Data Management Approach</span>
+        </div>
+        <div class="task-item">
+          <div class="task-check done">✓</div>
+          <span class="task-text done">Design the Layers</span>
+        </div>
+        <div class="task-item">
+          <div class="task-check done">✓</div>
+          <span class="task-text done">Draw the Data Architecture (Draw.io)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Project Initialization -->
+    <div class="epic-card fade-up d3">
+      <div class="epic-header">
+        <span class="epic-name">🔧 Project Initialization</span>
+        <span class="epic-badge done">✓ Complete</span>
+      </div>
+      <div class="epic-tasks">
+        <div class="task-item">
+          <div class="task-check done">✓</div>
+          <span class="task-text done">Create Detailed Project Tasks (Notion)</span>
+        </div>
+        <div class="task-item">
+          <div class="task-check done">✓</div>
+          <span class="task-text done">Define Project Naming Conventions</span>
+        </div>
+        <div class="task-item">
+          <div class="task-check done">✓</div>
+          <span class="task-text done">Create Git Repo & Prepare The Repo Structure</span>
+        </div>
+        <div class="task-item">
+          <div class="task-check done">✓</div>
+          <span class="task-text done">Create Database & Schemas</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bronze Layer -->
+    <div class="epic-card fade-up d1" style="border-color:rgba(205,127,50,.25)">
+      <div class="epic-header" style="border-color:rgba(205,127,50,.15)">
+        <span class="epic-name">🥉 Build Bronze Layer</span>
+        <span class="epic-badge done">✓ Complete</span>
+      </div>
+      <div class="epic-tasks">
+        <div class="task-item">
+          <div class="task-check done">✓</div>
+          <span class="task-text done">Analysing: Source Systems</span>
+        </div>
+        <div class="task-item">
+          <div class="task-check done">✓</div>
+          <span class="task-text done">Coding: Data Ingestion</span>
+        </div>
+        <div class="task-item">
+          <div class="task-check done">✓</div>
+          <span class="task-text done">Validating: Data Completeness & Schema Checks</span>
+        </div>
+        <div class="task-item">
+          <div class="task-check done">✓</div>
+          <span class="task-text done">Document: Draw Data Flow (Draw.io)</span>
+        </div>
+        <div class="task-item">
+          <div class="task-check done">✓</div>
+          <span class="task-text done">Commit Code in Git Repo</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Silver Layer -->
+    <div class="epic-card fade-up d2" style="border-color:rgba(168,169,173,.25)">
+      <div class="epic-header" style="border-color:rgba(168,169,173,.15)">
+        <span class="epic-name">🥈 Build Silver Layer</span>
+        <span class="epic-badge done">✓ Complete</span>
+      </div>
+      <div class="epic-tasks">
+        <div class="task-item">
+          <div class="task-check done">✓</div>
+          <span class="task-text done">Analysing: Explore & Understand Data</span>
+        </div>
+        <div class="task-item">
+          <div class="task-check done">✓</div>
+          <span class="task-text done">Document: Draw Data Integration (Draw.io)</span>
+        </div>
+        <div class="task-item">
+          <div class="task-check done">✓</div>
+          <span class="task-text done">Coding: Data Cleansing</span>
+        </div>
+        <div class="task-item">
+          <div class="task-check done">✓</div>
+          <span class="task-text done">Validating: Data Correctness Checks</span>
+        </div>
+        <div class="task-item">
+          <div class="task-check done">✓</div>
+          <span class="task-text done">Document: Extend Data Flow (Draw.io)</span>
+        </div>
+        <div class="task-item">
+          <div class="task-check done">✓</div>
+          <span class="task-text done">Commit Code in Git Repo</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gold Layer -->
+    <div class="epic-card fade-up d3" style="border-color:rgba(255,215,0,.25)">
+      <div class="epic-header" style="border-color:rgba(255,215,0,.15)">
+        <span class="epic-name">🥇 Build Gold Layer</span>
+        <span class="epic-badge done">✓ Complete</span>
+      </div>
+      <div class="epic-tasks">
+        <div class="task-item">
+          <div class="task-check done">✓</div>
+          <span class="task-text done">Analysing: Explore Business Objects</span>
+        </div>
+        <div class="task-item">
+          <div class="task-check done">✓</div>
+          <span class="task-text done">Coding: Data Integration</span>
+        </div>
+        <div class="task-item">
+          <div class="task-check done">✓</div>
+          <span class="task-text done">Validating: Data Integration Checks</span>
+        </div>
+        <div class="task-item">
+          <div class="task-check done">✓</div>
+          <span class="task-text done">Document: Draw Data Model of Star Schema (Draw.io)</span>
+        </div>
+        <div class="task-item">
+          <div class="task-check done">✓</div>
+          <span class="task-text done">Document: Create Data Catalog</span>
+        </div>
+        <div class="task-item">
+          <div class="task-check done">✓</div>
+          <span class="task-text done">Document: Extend Data Flow (Draw.io)</span>
+        </div>
+        <div class="task-item">
+          <div class="task-check done">✓</div>
+          <span class="task-text done">Commit Code in Git Repo</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<hr class="section-divider" />
+
+<!-- FOOTER -->
+<footer>
+  <span>© 2025 Salman Chaudhry · <a href="index.html">Back to Portfolio</a></span>
+  <span>SQL Data Warehouse · Medallion Architecture</span>
+</footer>
+
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(el => { if (el.isIntersecting) el.target.classList.add('visible'); });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+  // Animate main progress bar
+  setTimeout(() => {
+    const bar = document.getElementById('mainBar');
+    if (bar) { bar.style.width = '100%'; }
+    document.querySelectorAll('.fade-up').forEach((el, i) => {
+      setTimeout(() => el.classList.add('visible'), 80 + i * 60);
+    });
+  }, 400);
+</script>
+</body>
+</html>
