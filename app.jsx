@@ -6,7 +6,7 @@ const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
   "direction": "clinical",
   "accent": "mint",
   "density": "comfortable",
-  "showTicker": true
+  "showTicker": false
 }/*EDITMODE-END*/;
 
 // Each direction is a complete look: clinical (dark dashboard), editorial (light public-health),
@@ -31,6 +31,7 @@ function App() {
   const [activeNav, setActiveNav] = useS("overview");
   const [chartView, setChartView] = useS("impact");
   const [filter, setFilter] = useS("all");
+  const [showAllReports, setShowAllReports] = useS(false);
 
   // Apply direction (clinical/editorial/notebook) -> theme + accent
   useE(() => {
@@ -79,12 +80,12 @@ function App() {
 
   // Live impact ticker items
   const tickerItems = [
-    { t: "09:42", metric: "Risk-adjusted PMPM",        value: "\u2193 4.2%",  source: "Tabular model \u00b7 DAX",           color: "var(--accent)" },
-    { t: "09:51", metric: "Authorizations / quarter",  value: "+ 200",        source: "Orlando Health \u00b7 SQL",          color: "var(--accent-2)" },
+    { t: "09:42", metric: "Risk-adjusted PMPM",        value: "↓ 4.2%",  source: "Tabular model · DAX",           color: "var(--accent)" },
+    { t: "09:51", metric: "Authorizations / quarter",  value: "+ 200",        source: "Orlando Health · SQL",          color: "var(--accent-2)" },
     { t: "10:03", metric: "Revenue opportunity / mo",  value: "$64K",         source: "Epic EHR billing",                   color: "var(--accent)" },
-    { t: "10:14", metric: "Program efficacy YoY",      value: "\u25b2 25%",   source: "Power BI \u00b7 Exos",                color: "var(--warn)" },
+    { t: "10:14", metric: "Program efficacy YoY",      value: "▲ 25%",   source: "Power BI · Exos",                color: "var(--warn)" },
     { t: "10:22", metric: "Paid claims recovered / mo",value: "+ 251",        source: "Denial root-cause",                   color: "var(--accent-2)" },
-    { t: "10:36", metric: "BUs unified \u00b7 semantic model", value: "4 \u2192 1", source: "TRS \u00b7 Admin Services",     color: "var(--accent)" },
+    { t: "10:36", metric: "BUs unified · semantic model", value: "4 → 1", source: "TRS · Admin Services",     color: "var(--accent)" },
   ];
 
   // Project list
@@ -92,7 +93,7 @@ function App() {
     {
       id: "trs-claims-heatmap",
       cat: "bi",
-      title: "Claims Denial Heatmap \u00b7 73 Payers",
+      title: "Claims Denial Heatmap · 73 Payers",
       org: "Health Plan Reporting",
       impact: "$64K / mo recovered",
       tags: ["Power BI", "DAX", "Heatmap", "Risk Score"],
@@ -182,6 +183,7 @@ function App() {
   ];
 
   const filtered = filter === "all" ? reports : reports.filter(r => r.cat === filter);
+  const visibleReports = showAllReports ? filtered : filtered.slice(0, 4);
 
   return (
     <div className="app">
@@ -414,7 +416,7 @@ function App() {
             </Reveal>
 
             <div className="report-grid">
-              {filtered.map((r, i) => {
+              {visibleReports.map((r, i) => {
                 const Demo = r.Demo;
                 return (
                   <Reveal className="report" delay={(i % 3) * 0.06} key={r.id}>
@@ -438,6 +440,12 @@ function App() {
                 );
               })}
             </div>
+            
+            {!showAllReports && filtered.length > 4 && (
+              <div style={{ textAlign: "center", marginTop: 24 }}>
+                <button onClick={() => setShowAllReports(true)} className="cta-ghost">View All {filtered.length} Reports</button>
+              </div>
+            )}
           </section>
 
           {/* SKILLS */}
@@ -470,19 +478,18 @@ function App() {
               <Reveal className="skill-panel" delay={0.1}>
                 <div className="skill-panel-head">
                   <div className="skill-panel-title">Full Toolkit</div>
-                  <div className="skill-panel-meta">25 tools</div>
+                  <div className="skill-panel-meta">Key tools</div>
                 </div>
                 <div className="tools-grid">
                   {[
                     "Power BI","DAX","SQL","Python","Power Query","Databricks","PySpark","Excel",
-                    "SAS JMP","SSMS","Git","Epic EHR","ServiceNow","Visio","Jira","Qualtrics",
-                    "BPMN","KPI Design","Lean Six Sigma","Agile","ETL / ELT","EDA","HIPAA","Star Schema",
+                    "Epic EHR","Qualtrics","Lean Six Sigma","Star Schema",
                   ].map(t => <div key={t} className="tool">{t}</div>)}
                 </div>
                 <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid var(--line)", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-                  <Cert label="Sterling Academy" value="Lean Six Sigma · Green Belt" />
-                  <Cert label="Coursera" value="Google Data Analytics" />
-                  <Cert label="UT Austin" value="Business Analysis" />
+                  <Cert label="Sterling Academy" value="Lean Six Sigma · Green Belt" href="#" />
+                  <Cert label="Coursera" value="Google Data Analytics" href="#" />
+                  <Cert label="UT Austin" value="Business Analysis" href="#" />
                   <Cert label="Microsoft" value="Power BI Data Analyst · in progress" />
                   <Cert label="DataCamp" value="Data Analyst in Python · in progress" />
                 </div>
@@ -522,7 +529,10 @@ function App() {
                 </div>
                 <div style={{ fontSize: 14, fontWeight: 600 }}>Nova Southeastern University</div>
                 <div style={{ color: "var(--text-2)", fontSize: 12, marginTop: 2 }}>MS, Health Informatics</div>
-                <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--accent)", marginTop: 8 }}>GPA 3.8 · Davie, FL</div>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginTop: 8 }}>
+                  <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--accent)" }}>GPA 3.8 · Davie, FL</div>
+                  <a href="Diploma.jpg" target="_blank" className="report-link">View Diploma <Icon name="arrow" size={11} /></a>
+                </div>
               </Reveal>
               <Reveal className="board" delay={0.1}>
                 <div className="board-head">
@@ -579,9 +589,9 @@ function App() {
                        options={[["clinical", "Clinical"], ["editorial", "Editorial"], ["notebook", "Notebook"]]}
                        onChange={v => setTweak("direction", v)} />
           <div style={{ fontSize: 11, color: "var(--text-3)", lineHeight: 1.5, padding: "4px 2px" }}>
-            {tweaks.direction === "clinical"  && "Dense Epic/Tableau dashboard \u2014 dark, mint, data-rich."}
-            {tweaks.direction === "editorial" && "Public-health editorial \u2014 light, calm, infographic."}
-            {tweaks.direction === "notebook"  && "Jupyter notebook \u2014 monospaced, In/Out cells, code-led."}
+            {tweaks.direction === "clinical"  && "Dense Epic/Tableau dashboard — dark, mint, data-rich."}
+            {tweaks.direction === "editorial" && "Public-health editorial — light, calm, infographic."}
+            {tweaks.direction === "notebook"  && "Jupyter notebook — monospaced, In/Out cells, code-led."}
           </div>
         </TweakSection>
         <TweakSection title="Layout">
@@ -617,11 +627,27 @@ function SkillBar({ name, pct }) {
   );
 }
 
-function Cert({ label, value }) {
+function Cert({ label, value, href }) {
+  const content = (
+    <>
+      <div style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: "var(--text-3)", letterSpacing: 0.08, textTransform: "uppercase", marginBottom: 3, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        {label}
+        {href && <span style={{opacity: 0.5}}><Icon name="link" size={10} /></span>}
+      </div>
+      <div style={{ fontSize: 11, fontWeight: 500, color: "var(--text)" }}>{value}</div>
+    </>
+  );
+
+  if (href) {
+    return (
+      <a href={href} target="_blank" style={{ padding: 10, background: "var(--bg-2)", border: "1px solid var(--line)", borderRadius: 6, textDecoration: "none", display: "block", transition: "border-color 0.15s" }} onMouseOver={e => e.currentTarget.style.borderColor = 'var(--accent)'} onMouseOut={e => e.currentTarget.style.borderColor = 'var(--line)'}>
+        {content}
+      </a>
+    );
+  }
   return (
     <div style={{ padding: 10, background: "var(--bg-2)", border: "1px solid var(--line)", borderRadius: 6 }}>
-      <div style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: "var(--text-3)", letterSpacing: 0.08, textTransform: "uppercase", marginBottom: 3 }}>{label}</div>
-      <div style={{ fontSize: 11, fontWeight: 500, color: "var(--text)" }}>{value}</div>
+      {content}
     </div>
   );
 }
