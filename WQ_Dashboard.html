@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Orlando Health · WQ Impact Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#F2F2F3;color:#333;font-size:13px}
+a{color:inherit}
+
+/* ── Header ─────────────────────────────────────── */
+.hdr{background:#555759;padding:16px 28px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.hdr h1{color:#fff;font-size:16px;font-weight:700;letter-spacing:.2px}
+.hdr p{color:#bbb;font-size:11px;margin-top:3px}
+.badge{background:#C87000;color:#fff;padding:5px 14px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap}
+
+/* ── Layout ─────────────────────────────────────── */
+.wrap{max-width:1320px;margin:0 auto;padding:0 20px 32px}
+
+/* ── Finding ────────────────────────────────────── */
+.finding{background:#fff;border-left:5px solid #E8721F;padding:13px 18px;margin:18px 0 0;border-radius:0 6px 6px 0;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.finding-tag{font-size:10px;font-weight:700;color:#E8721F;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px}
+.finding p{font-size:13px;line-height:1.65;color:#333}
+.finding strong{color:#1B6B40}
+
+/* ── Filters ────────────────────────────────────── */
+.filters{display:flex;gap:24px;padding:16px 0 8px;align-items:center;flex-wrap:wrap}
+.fg{display:flex;align-items:center;gap:7px}
+.fg-lbl{font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.8px}
+.fbtn{padding:5px 15px;border:2px solid #E8721F;border-radius:4px;background:#fff;color:#E8721F;font-size:12px;font-weight:600;cursor:pointer;transition:all .12s;font-family:inherit}
+.fbtn.active{background:#E8721F;color:#fff}
+.fbtn:hover:not(.active){background:#fff3ec}
+
+/* ── KPI row ────────────────────────────────────── */
+.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:12px 0 16px}
+.kpi{background:#fff;border-radius:8px;padding:14px 15px;border-top:4px solid #E8721F;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.kpi-lbl{font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px}
+.kpi-val{font-size:24px;font-weight:700;color:#555759;line-height:1}
+.kpi-delta{font-size:11px;font-weight:600;margin-top:5px}
+.green{color:#1B6B40}.muted{color:#aaa}.warn{color:#C0392B}
+
+/* ── Chart grid ─────────────────────────────────── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.card{background:#fff;border-radius:8px;padding:18px 18px 12px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.ct{font-size:13px;font-weight:700;color:#222}
+.cs{font-size:11px;color:#888;margin-top:2px;margin-bottom:12px;line-height:1.4}
+.cw{position:relative;height:200px}
+
+/* ── Location table ─────────────────────────────── */
+.sec-hdr{font-size:14px;font-weight:700;color:#333;margin:4px 0 12px}
+.tcard{background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{background:#555759;color:#fff;padding:10px 14px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px}
+td{padding:9px 14px;border-bottom:1px solid #F2F2F3}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafafa}
+.heat{border-radius:4px;padding:2px 9px;font-weight:700;display:inline-block;font-size:11px;color:#fff}
+
+/* ── Recommendation ─────────────────────────────── */
+.rec{background:#555759;border-radius:8px;padding:18px 24px;margin:14px 0 0}
+.rec-tag{font-size:10px;font-weight:700;color:#E8721F;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.rec p{color:#ddd;font-size:13px;line-height:1.7}
+.rec strong{color:#E8721F}
+
+footer{text-align:center;padding:16px 0 4px;font-size:10px;color:#bbb;border-top:1px solid #e0e0e0;margin-top:18px}
+
+@media(max-width:960px){.kpis{grid-template-columns:repeat(3,1fr)}.g2{grid-template-columns:1fr}}
+@media(max-width:560px){.kpis{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="hdr">
+  <div>
+    <h1>Orlando Health &nbsp;·&nbsp; Radiology Scheduling Compliance</h1>
+    <p>Work Queue (WQ) Impact Dashboard &nbsp;·&nbsp; January – May 2024 &nbsp;·&nbsp; 94,497 outpatient imaging orders</p>
+  </div>
+  <div class="badge">⚡ WQ Go-Live: March 1, 2024</div>
+</div>
+
+<div class="wrap">
+
+<!-- Key Finding -->
+<div class="finding">
+  <div class="finding-tag">Key Finding</div>
+  <p>Replacing the manual DAR scheduling system with Work Queue (WQ) enforcement improved insurance payment compliance by <strong>+1.3 percentage points</strong> after the March 1 go-live — generating an estimated <strong>251 additional paid claims per month</strong> and <strong>$63,865 in additional monthly revenue ($766K annualized)</strong>. Volume grew 58% in the After period; scheduling accuracy and lead time held steady, confirming no operational trade-off from the new system.</p>
+</div>
+
+<!-- Filters -->
+<div class="filters">
+  <div class="fg">
+    <span class="fg-lbl">Period</span>
+    <button class="fbtn active" data-g="period" data-v="all">All</button>
+    <button class="fbtn" data-g="period" data-v="before">Before WQ</button>
+    <button class="fbtn" data-g="period" data-v="after">After WQ</button>
+  </div>
+  <div class="fg">
+    <span class="fg-lbl">Priority</span>
+    <button class="fbtn active" data-g="priority" data-v="all">All</button>
+    <button class="fbtn" data-g="priority" data-v="routine">Routine</button>
+    <button class="fbtn" data-g="priority" data-v="stat">STAT</button>
+  </div>
+</div>
+
+<!-- KPI Cards -->
+<div class="kpis">
+  <div class="kpi"><div class="kpi-lbl">Total Orders</div><div class="kpi-val" id="kv0">94K</div><div class="kpi-delta muted" id="kd0">Jan–May 2024</div></div>
+  <div class="kpi"><div class="kpi-lbl">Payment Rate</div><div class="kpi-val" id="kv1">74.4%</div><div class="kpi-delta green" id="kd1">▲ +1.3pp vs Before</div></div>
+  <div class="kpi"><div class="kpi-lbl">Avg Lead Time</div><div class="kpi-val" id="kv2">17.7d</div><div class="kpi-delta green" id="kd2">▼ −0.59d vs Before</div></div>
+  <div class="kpi"><div class="kpi-lbl">Accuracy Rate</div><div class="kpi-val" id="kv3">76.5%</div><div class="kpi-delta green" id="kd3">▲ +0.7pp vs Before</div></div>
+  <div class="kpi"><div class="kpi-lbl">Avg Paid Claim</div><div class="kpi-val" id="kv4">$254</div><div class="kpi-delta green" id="kd4">▲ +$16.96 vs Before</div></div>
+  <div class="kpi"><div class="kpi-lbl">Annual Rev Lift</div><div class="kpi-val" id="kv5">$766K</div><div class="kpi-delta green" id="kd5">251 extra claims/mo</div></div>
+</div>
+
+<!-- Row 1 -->
+<div class="g2">
+  <div class="card">
+    <div class="ct">Lead Time Trend — Routine Orders</div>
+    <div class="cs">Days from order to scheduled date · Orange = Before WQ, Green = After WQ · Dashed line = Go-Live</div>
+    <div class="cw"><canvas id="cLeadR"></canvas></div>
+  </div>
+  <div class="card">
+    <div class="ct">Monthly Payment Rate by Priority</div>
+    <div class="cs">% of orders that received insurance payment · Y-axis 60–82% to show meaningful variation</div>
+    <div class="cw"><canvas id="cPay"></canvas></div>
+  </div>
+</div>
+
+<!-- Row 2 -->
+<div class="g2">
+  <div class="card">
+    <div class="ct">Weighted Revenue Points by Month</div>
+    <div class="cs">Modality-weighted revenue score (NM=10, CT=5, MR=4 … XR=1) · stacked by priority</div>
+    <div class="cw"><canvas id="cPts"></canvas></div>
+  </div>
+  <div class="card">
+    <div class="ct">Revenue Points by Modality</div>
+    <div class="cs">Total insurance revenue weight by imaging type · hover for case count</div>
+    <div class="cw"><canvas id="cMod"></canvas></div>
+  </div>
+</div>
+
+<!-- Row 3 -->
+<div class="g2">
+  <div class="card">
+    <div class="ct">Lead Time Trend — STAT Orders</div>
+    <div class="cs">Urgent orders stayed fast · WQ did not delay emergency scheduling · Y-axis 0–4d</div>
+    <div class="cw"><canvas id="cLeadS"></canvas></div>
+  </div>
+  <div class="card">
+    <div class="ct">Scheduling Accuracy Rate</div>
+    <div class="cs">% of Routine orders scheduled within insurance authorization window · STAT excluded by design</div>
+    <div class="cw"><canvas id="cAcc"></canvas></div>
+  </div>
+</div>
+
+<!-- Location matrix -->
+<div class="sec-hdr">Location Performance Matrix</div>
+<div class="tcard">
+  <table>
+    <thead>
+      <tr>
+        <th>Location</th><th>City</th><th>Cases</th>
+        <th>Payment Rate</th><th>Accuracy</th><th>Avg Lead</th><th>vs Network</th>
+      </tr>
+    </thead>
+    <tbody id="locBody"></tbody>
+  </table>
+</div>
+
+<!-- Recommendation -->
+<div class="rec">
+  <div class="rec-tag">Recommendation</div>
+  <p>WQ enforcement demonstrably improves scheduling compliance and insurance payment rates with no operational cost. <strong>Expand WQ rollout to all Orlando Health imaging service lines.</strong> Priority targets: <strong>South Orange</strong> (15,561 cases at 69.1% payment rate — highest volume, most revenue upside), <strong>Altamonte Springs</strong> (64.6% accuracy — lowest in network, highest compliance risk), and <strong>Bayfront St. Petersburg</strong> (43.7% payment rate — distinct payor mix requiring separate investigation). Full-network improvement of 1.3pp at current volume represents an estimated <strong>$766K+ in incremental annual revenue</strong>.</p>
+</div>
+
+<footer>Source: Epic EHR export · Orlando Health Radiology Referral &amp; Authorization · Jan–May 2024 · 94,497 outpatient imaging orders &nbsp;|&nbsp; Analyst: Power BI Desktop + DAX &nbsp;|&nbsp; WQ Go-Live: March 1, 2024</footer>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────
+const MONTHS=['January','February','March','April','May'];
+const C={ORANGE:'#E8721F',GREEN:'#1B6B40',GRAY:'#9A9C9E',LGRAY:'#F2D0D5',AMBER:'#C87000'};
+
+const D={
+  routine:{
+    cases:[16741,16791,16682,18131,18316],
+    pay:[73.5,74.8,75.1,74.4,76.6],
+    acc:[75.6,76.6,76.8,77.8,75.7],
+    lead:[20.33,18.53,18.81,19.28,18.20],
+    pts:[47184,47878,47950,51963,52574]
+  },
+  stat:{
+    cases:[1544,1388,1423,1585,1554],
+    pay:[67.3,68.3,68.7,70.0,70.3],
+    lead:[2.56,2.66,2.59,2.72,2.68],
+    pts:[5394,5028,5142,5878,5660]
+  },
+  mod:{
+    names:['CT Scan','MRI','Ultrasound','Breast Imaging','X-Ray','Nuclear Med','Bone Density','Fluoroscopy'],
+    pts:[79605,78504,44553,36014,17235,12570,6908,75],
+    cases:[15921,19626,17821,18007,17235,1257,4605,25]
+  },
+  kpi:{
+    all: {cases:94497,pay:'74.4%',lead:'17.7d',acc:'76.5%',pmt:'$247',rev:'$766K'},
+    before:{cases:36589,pay:'73.6%',lead:'18.0d',acc:'76.1%',pmt:'$238',rev:'—'},
+    after: {cases:57908,pay:'74.9%',lead:'17.5d',acc:'76.8%',pmt:'$255',rev:'$766K'}
+  },
+  locs:[
+    {name:'South Orange',     city:'Orlando',       cases:15561,pay:69.1,acc:79.8,lead:16.4},
+    {name:'Medical Pavilion', city:'Orlando',       cases:13378,pay:79.8,acc:75.6,lead:20.7},
+    {name:'Lake Mary',        city:'Lake Mary',     cases:11770,pay:78.8,acc:80.7,lead:27.0},
+    {name:'Ocoee',            city:'Ocoee',         cases:10039,pay:76.2,acc:79.3,lead:20.4},
+    {name:'Summerport',       city:'Windermere',    cases:9787, pay:74.8,acc:79.2,lead:22.9},
+    {name:'Osceola',          city:'Kissimmee',     cases:7826, pay:77.7,acc:71.9,lead:13.4},
+    {name:'Alafaya',          city:'Orlando',       cases:7468, pay:73.1,acc:72.6,lead:10.0},
+    {name:'Altamonte Springs',city:'Altamonte Spgs',cases:7045, pay:71.9,acc:64.6,lead:9.1},
+    {name:'Downtown Orlando', city:'Orlando',       cases:5666, pay:62.8,acc:72.9,lead:4.3},
+    {name:'Winter Park',      city:'Winter Park',   cases:4674, pay:81.7,acc:80.4,lead:24.5},
+    {name:'Longwood',         city:'Longwood',      cases:716,  pay:60.6,acc:77.7,lead:5.2},
+    {name:'Bayfront St. Pete',city:'St. Petersburg',cases:567,  pay:43.7,acc:79.4,lead:7.2}
+  ]
+};
+
+// ── STATE ─────────────────────────────────────────────────────────────────
+let period='all', priority='all';
+
+// ── GO-LIVE LINE PLUGIN ───────────────────────────────────────────────────
+Chart.register({
+  id:'goLive',
+  afterDraw(chart){
+    if(!chart.config.options.goLive) return;
+    const {ctx,scales:{x,y}}=chart;
+    const px=Math.round((x.getPixelForValue(1)+x.getPixelForValue(2))/2);
+    ctx.save();
+    ctx.beginPath();ctx.moveTo(px,y.top);ctx.lineTo(px,y.bottom);
+    ctx.setLineDash([5,4]);ctx.strokeStyle=C.AMBER;ctx.lineWidth=2;ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle=C.AMBER;ctx.font='bold 10px Segoe UI,system-ui,sans-serif';
+    ctx.fillText('WQ Go-Live',px+5,y.top+13);
+    ctx.restore();
+  }
+});
+
+Chart.defaults.font.family='Segoe UI,system-ui,sans-serif';
+Chart.defaults.font.size=11;
+Chart.defaults.color='#666';
+
+// ── HELPERS ───────────────────────────────────────────────────────────────
+const wavg=(vals,wts)=>{const s=wts.reduce((a,b)=>a+b,0);return vals.reduce((a,v,i)=>a+v*wts[i],0)/s};
+
+function heatBg(val,min,max,invert=false){
+  let t=Math.max(0,Math.min(1,(val-min)/(max-min)));
+  if(invert)t=1-t;
+  const r=Math.round(192+t*(27-192));
+  const g=Math.round(57+t*(107-57));
+  const b=Math.round(43+t*(64-43));
+  return`rgb(${r},${g},${b})`;
+}
+
+function legOpts(){
+  return{display:true,position:'top',labels:{usePointStyle:true,pointStyleWidth:8,boxHeight:7,font:{size:11}}};
+}
+
+function lineDs(label,data,color,alpha='.20'){
+  return{label,data,borderColor:color,backgroundColor:color+alpha,pointBackgroundColor:color,pointRadius:4,pointHoverRadius:6,tension:.3,fill:false};
+}
+
+// ── CHART INIT ────────────────────────────────────────────────────────────
+const charts={};
+
+// V1 Lead Routine
+charts.leadR=new Chart(document.getElementById('cLeadR'),{
+  type:'line',
+  data:{labels:MONTHS,datasets:[
+    lineDs('Before WQ',[20.33,18.53,18.81,null,null],C.ORANGE),
+    lineDs('After WQ',[null,18.53,18.81,19.28,18.20],C.GREEN)
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,goLive:true,
+    plugins:{legend:legOpts(),tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${c.parsed.y?.toFixed(2)??'—'} days`}}},
+    scales:{x:{grid:{display:false}},y:{min:16,max:22,ticks:{callback:v=>`${v}d`},title:{display:true,text:'Days',font:{size:10}}}}}
+});
+
+// V2 Payment Rate
+charts.pay=new Chart(document.getElementById('cPay'),{
+  type:'bar',
+  data:{labels:MONTHS,datasets:[
+    {label:'Routine',data:[...D.routine.pay],backgroundColor:C.ORANGE,borderRadius:3},
+    {label:'STAT',data:[...D.stat.pay],backgroundColor:C.GRAY,borderRadius:3}
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:legOpts(),tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${c.parsed.y?.toFixed(1)??'—'}%`}}},
+    scales:{x:{grid:{display:false}},y:{min:60,max:82,ticks:{callback:v=>`${v}%`},title:{display:true,text:'Payment Rate',font:{size:10}}}}}
+});
+
+// V3 Revenue Points stacked
+charts.pts=new Chart(document.getElementById('cPts'),{
+  type:'bar',
+  data:{labels:MONTHS,datasets:[
+    {label:'Routine',data:[...D.routine.pts],backgroundColor:C.ORANGE,stack:'s',borderRadius:3},
+    {label:'STAT',data:[...D.stat.pts],backgroundColor:C.LGRAY,stack:'s',borderRadius:3}
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:legOpts(),tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${c.parsed.y?.toLocaleString()??'—'}`}}},
+    scales:{x:{grid:{display:false},stacked:true},y:{stacked:true,ticks:{callback:v=>`${(v/1000).toFixed(0)}K`},title:{display:true,text:'Insurance Points',font:{size:10}}}}}
+});
+
+// V4 Modality horizontal
+charts.mod=new Chart(document.getElementById('cMod'),{
+  type:'bar',
+  data:{labels:D.mod.names,datasets:[{label:'Points',data:D.mod.pts,backgroundColor:C.ORANGE,borderRadius:3}]},
+  options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.parsed.x.toLocaleString()} pts · ${D.mod.cases[c.dataIndex].toLocaleString()} cases`}}},
+    scales:{x:{ticks:{callback:v=>`${(v/1000).toFixed(0)}K`},title:{display:true,text:'Total Insurance Points',font:{size:10}}},y:{grid:{display:false}}}}
+});
+
+// V5 STAT Lead
+charts.leadS=new Chart(document.getElementById('cLeadS'),{
+  type:'line',
+  data:{labels:MONTHS,datasets:[
+    lineDs('Before WQ',[2.56,2.66,2.59,null,null],C.GRAY+'bb','.15'),
+    lineDs('After WQ',[null,2.66,2.59,2.72,2.68],C.GRAY,'.20')
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,goLive:true,
+    plugins:{legend:legOpts(),tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${c.parsed.y?.toFixed(2)??'—'} days`}}},
+    scales:{x:{grid:{display:false}},y:{min:0,max:4,ticks:{callback:v=>`${v}d`},title:{display:true,text:'Days',font:{size:10}}}}}
+});
+
+// V6 Accuracy
+charts.acc=new Chart(document.getElementById('cAcc'),{
+  type:'line',
+  data:{labels:MONTHS,datasets:[
+    {label:'Accuracy Rate',data:[75.6,76.6,76.8,77.8,75.7],borderColor:C.ORANGE,backgroundColor:C.ORANGE+'18',pointBackgroundColor:C.ORANGE,pointRadius:4,pointHoverRadius:6,tension:.3,fill:true}
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,goLive:true,
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`Accuracy: ${c.parsed.y.toFixed(1)}%`}}},
+    scales:{x:{grid:{display:false}},y:{min:70,max:82,ticks:{callback:v=>`${v}%`},title:{display:true,text:'Accuracy Rate (Routine)',font:{size:10}}}}}
+});
+
+// ── LOCATION TABLE ─────────────────────────────────────────────────────────
+const netPayAvg=74.4;
+const payVals=D.locs.map(l=>l.pay), accVals=D.locs.map(l=>l.acc), leadVals=D.locs.map(l=>l.lead);
+const [minP,maxP]=[Math.min(...payVals),Math.max(...payVals)];
+const [minA,maxA]=[Math.min(...accVals),Math.max(...accVals)];
+const [minL,maxL]=[Math.min(...leadVals),Math.max(...leadVals)];
+
+const tbody=document.getElementById('locBody');
+D.locs.forEach(l=>{
+  const diff=(l.pay-netPayAvg).toFixed(1);
+  const sign=diff>=0?'▲ +':'▼ ';
+  const cls=diff>=0?'green':'warn';
+  const tr=document.createElement('tr');
+  tr.innerHTML=`
+    <td><strong>${l.name}</strong></td>
+    <td style="color:#888">${l.city}</td>
+    <td>${l.cases.toLocaleString()}</td>
+    <td><span class="heat" style="background:${heatBg(l.pay,minP,maxP)}">${l.pay.toFixed(1)}%</span></td>
+    <td><span class="heat" style="background:${heatBg(l.acc,minA,maxA)}">${l.acc.toFixed(1)}%</span></td>
+    <td><span class="heat" style="background:${heatBg(l.lead,minL,maxL,true)}">${l.lead.toFixed(1)}d</span></td>
+    <td class="${cls}" style="font-weight:700">${sign}${Math.abs(diff)}pp</td>`;
+  tbody.appendChild(tr);
+});
+
+// ── KPI UPDATE ─────────────────────────────────────────────────────────────
+function updateKPIs(){
+  const p=period, pr=priority;
+  let src=D.kpi.all;
+  if(p==='before') src=D.kpi.before;
+  else if(p==='after') src=D.kpi.after;
+
+  // Priority override (compute from monthly data)
+  if(pr!=='all'){
+    const srcD=pr==='routine'?D.routine:D.stat;
+    const idxs=p==='before'?[0,1]:p==='after'?[2,3,4]:[0,1,2,3,4];
+    const c=idxs.reduce((a,i)=>a+srcD.cases[i],0);
+    const pavg=wavg(idxs.map(i=>srcD.pay[i]),idxs.map(i=>srcD.cases[i]));
+    const lavg=wavg(idxs.map(i=>srcD.lead[i]),idxs.map(i=>srcD.cases[i]));
+    const aavg=pr==='routine'?wavg(idxs.map(i=>srcD.acc[i]),idxs.map(i=>srcD.cases[i])):null;
+    src={cases:c,pay:pavg.toFixed(1)+'%',lead:lavg.toFixed(1)+'d',acc:aavg?aavg.toFixed(1)+'%':'N/A',pmt:src.pmt,rev:src.rev};
+  }
+
+  const fmt=v=>typeof v==='number'?v.toLocaleString():v;
+  document.getElementById('kv0').textContent=fmt(src.cases);
+  document.getElementById('kv1').textContent=src.pay;
+  document.getElementById('kv2').textContent=src.lead;
+  document.getElementById('kv3').textContent=src.acc;
+  document.getElementById('kv4').textContent=src.pmt;
+  document.getElementById('kv5').textContent=src.rev;
+
+  const showDelta=p!=='before';
+  const setDelta=(id,text,cls)=>{const el=document.getElementById(id);el.textContent=text;el.className='kpi-delta '+cls};
+  if(showDelta){
+    setDelta('kd0','Jan–May 2024','muted');
+    setDelta('kd1','▲ +1.3pp vs Before','green');
+    setDelta('kd2','▼ −0.59d vs Before','green');
+    setDelta('kd3','▲ +0.7pp vs Before','green');
+    setDelta('kd4','▲ +$16.96 vs Before','green');
+    setDelta('kd5','251 extra claims/mo','green');
+  } else {
+    ['kd1','kd2','kd3','kd4'].forEach(id=>setDelta(id,'Baseline period','muted'));
+    setDelta('kd0','Jan–May 2024','muted');
+    setDelta('kd5','Pre-WQ period','muted');
+  }
+}
+
+// ── CHART UPDATE ───────────────────────────────────────────────────────────
+function updateCharts(){
+  const p=period, pr=priority;
+
+  // V1 Lead Routine — before/after series visibility
+  if(p==='all'){
+    charts.leadR.data.datasets[0].data=[20.33,18.53,18.81,null,null];
+    charts.leadR.data.datasets[1].data=[null,18.53,18.81,19.28,18.20];
+    charts.leadR.data.datasets[0].hidden=false;
+    charts.leadR.data.datasets[1].hidden=false;
+  } else if(p==='before'){
+    charts.leadR.data.datasets[0].data=[20.33,18.53,null,null,null];
+    charts.leadR.data.datasets[0].hidden=false;
+    charts.leadR.data.datasets[1].hidden=true;
+  } else {
+    charts.leadR.data.datasets[1].data=[null,null,18.81,19.28,18.20];
+    charts.leadR.data.datasets[0].hidden=true;
+    charts.leadR.data.datasets[1].hidden=false;
+  }
+  charts.leadR.update();
+
+  // V2 Pay Rate
+  const showR=pr!=='stat', showS=pr!=='routine';
+  const slice=(arr)=>p==='before'?arr.slice(0,2).concat([null,null,null]):p==='after'?[null,null,...arr.slice(2)]:[...arr];
+  charts.pay.data.datasets[0].data=slice(D.routine.pay);
+  charts.pay.data.datasets[1].data=slice(D.stat.pay);
+  charts.pay.data.datasets[0].hidden=!showR;
+  charts.pay.data.datasets[1].hidden=!showS;
+  charts.pay.update();
+
+  // V3 Points
+  charts.pts.data.datasets[0].data=slice(D.routine.pts);
+  charts.pts.data.datasets[1].data=slice(D.stat.pts);
+  charts.pts.data.datasets[0].hidden=!showR;
+  charts.pts.data.datasets[1].hidden=!showS;
+  charts.pts.update();
+
+  // V5 STAT Lead
+  if(p==='all'){
+    charts.leadS.data.datasets[0].data=[2.56,2.66,2.59,null,null];
+    charts.leadS.data.datasets[1].data=[null,2.66,2.59,2.72,2.68];
+    charts.leadS.data.datasets[0].hidden=false;
+    charts.leadS.data.datasets[1].hidden=false;
+  } else if(p==='before'){
+    charts.leadS.data.datasets[0].data=[2.56,2.66,null,null,null];
+    charts.leadS.data.datasets[0].hidden=false;
+    charts.leadS.data.datasets[1].hidden=true;
+  } else {
+    charts.leadS.data.datasets[1].data=[null,null,2.59,2.72,2.68];
+    charts.leadS.data.datasets[0].hidden=true;
+    charts.leadS.data.datasets[1].hidden=false;
+  }
+  charts.leadS.update();
+
+  // V6 Accuracy
+  const accAll=[75.6,76.6,76.8,77.8,75.7];
+  charts.acc.data.datasets[0].data=p==='before'?[75.6,76.6,null,null,null]:p==='after'?[null,null,76.8,77.8,75.7]:accAll;
+  charts.acc.update();
+}
+
+// ── FILTERS ────────────────────────────────────────────────────────────────
+document.querySelectorAll('.fbtn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const g=btn.dataset.g, v=btn.dataset.v;
+    document.querySelectorAll(`.fbtn[data-g="${g}"]`).forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    if(g==='period') period=v;
+    else priority=v;
+    updateKPIs();
+    updateCharts();
+  });
+});
+</script>
+</body>
+</html>
