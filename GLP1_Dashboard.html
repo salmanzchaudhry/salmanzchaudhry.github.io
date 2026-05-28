@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GLP-1 Spending in Medicare · Part D Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#F0F4F8;color:#1a2a3a;font-size:13px}
+
+/* Header */
+.hdr{background:linear-gradient(135deg,#0A2342 0%,#1a3a5c 100%);padding:18px 28px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.hdr h1{color:#fff;font-size:17px;font-weight:700;letter-spacing:.2px}
+.hdr p{color:#8ab4d4;font-size:11px;margin-top:3px}
+.badge{background:#E8721F;color:#fff;padding:5px 14px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap}
+.badge-blue{background:#1D6FA4;color:#fff;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap;margin-left:6px}
+
+.wrap{max-width:1320px;margin:0 auto;padding:0 20px 32px}
+
+/* Finding */
+.finding{background:#fff;border-left:5px solid #E8721F;padding:13px 18px;margin:18px 0 0;border-radius:0 6px 6px 0;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.finding-tag{font-size:10px;font-weight:700;color:#E8721F;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px}
+.finding p{font-size:13px;line-height:1.65;color:#333}
+.finding strong{color:#C0392B}
+.finding .green{color:#1B6B40;font-weight:700}
+
+/* Tabs */
+.tabs{display:flex;gap:4px;padding:16px 0 4px;flex-wrap:wrap}
+.tab{padding:7px 18px;border:2px solid #1D6FA4;border-radius:4px;background:#fff;color:#1D6FA4;font-size:12px;font-weight:600;cursor:pointer;transition:all .12s;font-family:inherit}
+.tab.active{background:#1D6FA4;color:#fff}
+.tab:hover:not(.active){background:#eaf3fb}
+
+/* Filters */
+.filters{display:flex;gap:20px;padding:8px 0 12px;align-items:center;flex-wrap:wrap}
+.fg{display:flex;align-items:center;gap:7px}
+.fg-lbl{font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.8px}
+.fbtn{padding:5px 14px;border:2px solid #1D6FA4;border-radius:4px;background:#fff;color:#1D6FA4;font-size:11px;font-weight:600;cursor:pointer;transition:all .12s;font-family:inherit}
+.fbtn.active{background:#1D6FA4;color:#fff}
+.fbtn:hover:not(.active){background:#eaf3fb}
+
+/* KPIs */
+.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:4px 0 16px}
+.kpi{background:#fff;border-radius:8px;padding:14px 15px;border-top:4px solid #1D6FA4;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+.kpi-lbl{font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px}
+.kpi-val{font-size:22px;font-weight:700;color:#0A2342;line-height:1}
+.kpi-delta{font-size:11px;font-weight:600;margin-top:5px}
+.red{color:#C0392B}.green2{color:#1B6B40}.muted{color:#aaa}.amber{color:#C87000}
+
+/* Chart grid */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px}
+.card{background:#fff;border-radius:8px;padding:18px 18px 12px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.ct{font-size:13px;font-weight:700;color:#0A2342}
+.cs{font-size:11px;color:#888;margin-top:2px;margin-bottom:12px;line-height:1.4}
+.cw{position:relative;height:210px}
+.cw-tall{position:relative;height:260px}
+
+/* Drug legend */
+.drug-legend{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.dl-item{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600}
+.dl-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+
+/* Timeline table */
+.tcard{background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:14px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{background:#0A2342;color:#fff;padding:10px 14px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px}
+td{padding:9px 14px;border-bottom:1px solid #F0F4F8;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#f8fbff}
+.heat{border-radius:4px;padding:2px 8px;font-weight:700;display:inline-block;font-size:11px;color:#fff}
+.tag{border-radius:10px;padding:2px 8px;font-size:10px;font-weight:700;display:inline-block}
+.tag-novo{background:#e8f4fd;color:#1D6FA4}
+.tag-lilly{background:#fff0e8;color:#C87000}
+.tag-az{background:#f0faf0;color:#1B6B40}
+
+/* Policy timeline */
+.timeline{position:relative;padding:4px 0}
+.tl-item{display:flex;gap:14px;margin-bottom:14px;align-items:flex-start}
+.tl-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;margin-top:3px;border:2px solid #fff;box-shadow:0 0 0 2px currentColor}
+.tl-year{font-size:11px;font-weight:700;color:#0A2342;min-width:36px}
+.tl-text{font-size:12px;color:#555;line-height:1.5}
+.tl-text strong{color:#0A2342}
+
+/* Rec */
+.rec{background:#0A2342;border-radius:8px;padding:18px 24px;margin:4px 0 0}
+.rec-tag{font-size:10px;font-weight:700;color:#E8721F;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.rec p{color:#cdd9e5;font-size:13px;line-height:1.7}
+.rec strong{color:#E8721F}
+
+/* Sections */
+.section{display:none}
+.section.active{display:block}
+
+footer{text-align:center;padding:16px 0 4px;font-size:10px;color:#aaa;border-top:1px solid #dde;margin-top:18px}
+
+@media(max-width:960px){.kpis{grid-template-columns:repeat(3,1fr)}.g2,.g3{grid-template-columns:1fr}}
+@media(max-width:560px){.kpis{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div>
+    <h1>Medicare Part D &nbsp;·&nbsp; GLP-1 Drug Spending Analysis</h1>
+    <p>Source: CMS Medicare Part D Spending by Drug · 2019–2023 · KFF / OIG Analysis &nbsp;|&nbsp; Gross spending, does not reflect manufacturer rebates</p>
+  </div>
+  <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+    <div class="badge">↑ $552M → $9.2B (Ozempic)</div>
+    <div class="badge-blue">5-Year CAGR: ~76%</div>
+  </div>
+</div>
+
+<div class="wrap">
+
+<div class="finding">
+  <div class="finding-tag">Key Finding</div>
+  <p>Gross Medicare Part D spending on GLP-1 drugs grew <strong>5× from 2019 to 2023</strong>, driven almost entirely by three newer agents: Ozempic (+1,567%), Rybelsus (+2,182%), and Mounjaro (launched 2022, +1,541% by 2023). Legacy GLP-1s like Trulicity and Victoza are in structural decline. <span class="green">Medicare currently covers these drugs only for Type 2 diabetes and cardiovascular disease</span> — obesity coverage remains prohibited by law, meaning the $9.2B Ozempic spend in 2023 reflects just one of its three indications. The BALANCE model launching 2027 and negotiated Ozempic pricing (~$274/30-day supply effective 2027) will materially reshape this spending trajectory.</p>
+</div>
+
+<!-- Tabs -->
+<div class="tabs">
+  <button class="tab active" onclick="showSection('overview')">Overview</button>
+  <button class="tab" onclick="showSection('drugs')">By Drug</button>
+  <button class="tab" onclick="showSection('policy')">Policy Context</button>
+</div>
+
+<!-- ── OVERVIEW ── -->
+<div class="section active" id="s-overview">
+
+<div class="filters">
+  <div class="fg">
+    <span class="fg-lbl">Drug Class</span>
+    <button class="fbtn active" data-g="class" data-v="all">All GLP-1s</button>
+    <button class="fbtn" data-g="class" data-v="new">New Gen (Ozempic, Rybelsus, Mounjaro)</button>
+    <button class="fbtn" data-g="class" data-v="legacy">Legacy (Trulicity, Victoza)</button>
+  </div>
+</div>
+
+<div class="kpis">
+  <div class="kpi"><div class="kpi-lbl">2023 Total Spending</div><div class="kpi-val" id="kv0">$35.8B</div><div class="kpi-delta red" id="kd0">▲ 364% vs 2019</div></div>
+  <div class="kpi"><div class="kpi-lbl">Ozempic 2023</div><div class="kpi-val">$9.2B</div><div class="kpi-delta red">▲ 1,567% vs 2019</div></div>
+  <div class="kpi"><div class="kpi-lbl">Beneficiaries (Ozempic)</div><div class="kpi-val">1.5M</div><div class="kpi-delta red">▲ 929% vs 2019</div></div>
+  <div class="kpi"><div class="kpi-lbl">Mounjaro Launch</div><div class="kpi-val">2022</div><div class="kpi-delta amber">+1,541% by 2023</div></div>
+  <div class="kpi"><div class="kpi-lbl">Negotiated Price</div><div class="kpi-val">$274</div><div class="kpi-delta green2">30-day supply, 2027</div></div>
+  <div class="kpi"><div class="kpi-lbl">2024 Total (KFF)</div><div class="kpi-val">$27.5B</div><div class="kpi-delta muted">GLP-1s only, gross</div></div>
+</div>
+
+<div class="g2">
+  <div class="card">
+    <div class="ct">Total GLP-1 Gross Spending — Medicare Part D</div>
+    <div class="cs">Gross spending 2019–2023 · does not reflect rebates · OIG/KFF analysis of CMS data</div>
+    <div class="cw-tall"><canvas id="cTotal"></canvas></div>
+  </div>
+  <div class="card">
+    <div class="ct">Spending by Drug — Stacked Area</div>
+    <div class="cs">New-gen drugs dominating spend share while legacy products decline in relative terms</div>
+    <div class="drug-legend" id="drugLegend"></div>
+    <div class="cw"><canvas id="cStacked"></canvas></div>
+  </div>
+</div>
+
+<div class="g2">
+  <div class="card">
+    <div class="ct">Ozempic Beneficiary Growth vs Spending Growth</div>
+    <div class="cs">Dual-axis: enrollees (left) vs gross spending in $B (right) · 142K enrollees in 2019 → 1.5M in 2023</div>
+    <div class="cw-tall"><canvas id="cOzDual"></canvas></div>
+  </div>
+  <div class="card">
+    <div class="ct">New Gen vs Legacy GLP-1 Spending Share</div>
+    <div class="cs">Market shift underway — new agents capturing majority of GLP-1 Part D spend</div>
+    <div class="cw-tall"><canvas id="cShare"></canvas></div>
+  </div>
+</div>
+
+</div><!-- /overview -->
+
+<!-- ── BY DRUG ── -->
+<div class="section" id="s-drugs">
+
+<div class="tcard">
+  <table>
+    <thead>
+      <tr>
+        <th>Drug (Brand)</th><th>Active Ingredient</th><th>Manufacturer</th>
+        <th>FDA Approved</th><th>Part D Coverage</th>
+        <th>2019 Spend</th><th>2023 Spend</th><th>Growth</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Ozempic</strong></td><td>Semaglutide inj.</td>
+        <td><span class="tag tag-novo">Novo Nordisk</span></td>
+        <td>Dec 2017</td><td>T2D, CVD (2024)</td>
+        <td>$552M</td><td><span class="heat" style="background:#C0392B">$9.2B</span></td>
+        <td class="red" style="font-weight:700">+1,567%</td>
+      </tr>
+      <tr>
+        <td><strong>Rybelsus</strong></td><td>Semaglutide oral</td>
+        <td><span class="tag tag-novo">Novo Nordisk</span></td>
+        <td>Sep 2019</td><td>T2D</td>
+        <td>&lt;$1M</td><td><span class="heat" style="background:#e05252">$1.7B</span></td>
+        <td class="red" style="font-weight:700">+2,182%</td>
+      </tr>
+      <tr>
+        <td><strong>Mounjaro</strong></td><td>Tirzepatide</td>
+        <td><span class="tag tag-lilly">Eli Lilly</span></td>
+        <td>May 2022</td><td>T2D</td>
+        <td>—</td><td><span class="heat" style="background:#e07830">$2.1B</span></td>
+        <td class="amber" style="font-weight:700">+1,541% (2022→23)</td>
+      </tr>
+      <tr>
+        <td><strong>Wegovy</strong></td><td>Semaglutide inj.</td>
+        <td><span class="tag tag-novo">Novo Nordisk</span></td>
+        <td>Jun 2021</td><td>CVD (2024); obesity coverage prohibited</td>
+        <td>—</td><td><span class="heat" style="background:#5a95d0">~$367M</span></td>
+        <td class="muted">Launching</td>
+      </tr>
+      <tr>
+        <td><strong>Trulicity</strong></td><td>Dulaglutide</td>
+        <td><span class="tag tag-lilly">Eli Lilly</span></td>
+        <td>Sep 2014</td><td>T2D, CVD</td>
+        <td>~$4.1B</td><td><span class="heat" style="background:#2d7d9a">~$7.2B</span></td>
+        <td class="muted">Stable/declining share</td>
+      </tr>
+      <tr>
+        <td><strong>Victoza</strong></td><td>Liraglutide inj.</td>
+        <td><span class="tag tag-novo">Novo Nordisk</span></td>
+        <td>Jan 2010</td><td>T2D, CVD</td>
+        <td>~$2.4B</td><td><span class="heat" style="background:#4a7a6a">~$1.8B</span></td>
+        <td class="green2">Declining (−25%)</td>
+      </tr>
+      <tr>
+        <td><strong>Byetta / Bydureon</strong></td><td>Exenatide</td>
+        <td><span class="tag tag-az">AstraZeneca</span></td>
+        <td>2005/2012</td><td>T2D (legacy)</td>
+        <td>~$0.4B</td><td><span class="heat" style="background:#6a7a6a">~$0.1B</span></td>
+        <td class="green2">Declining</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="g2">
+  <div class="card">
+    <div class="ct">Per-Drug Spending Trend</div>
+    <div class="cs">Ozempic (orange) · Rybelsus (teal) · Mounjaro (gold) · Trulicity (blue) · Victoza (green)</div>
+    <div class="cw-tall"><canvas id="cPerDrug"></canvas></div>
+  </div>
+  <div class="card">
+    <div class="ct">2023 Spending Mix — GLP-1 Market Share</div>
+    <div class="cs">Ozempic alone = ~42% of total GLP-1 Part D spend · Legacy drugs declining in share</div>
+    <div class="cw-tall"><canvas id="cPie"></canvas></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="ct">Manufacturer Revenue Breakdown — Novo Nordisk vs Eli Lilly vs Other</div>
+  <div class="cs">Stacked by manufacturer · Novo Nordisk dominates but Eli Lilly gaining fast through Mounjaro and Trulicity</div>
+  <div class="cw"><canvas id="cMfr"></canvas></div>
+</div>
+
+</div><!-- /drugs -->
+
+<!-- ── POLICY ── -->
+<div class="section" id="s-policy">
+
+<div class="g2">
+  <div class="card">
+    <div class="ct">Key Policy Timeline</div>
+    <div class="cs">FDA approvals, Medicare coverage expansions, price negotiation milestones</div>
+    <div class="timeline" id="policyTimeline" style="max-height:320px;overflow-y:auto;padding-right:8px"></div>
+  </div>
+  <div class="card">
+    <div class="ct">Spending Trajectory — Projected Impact of Policy Changes</div>
+    <div class="cs">Gross spending 2019–2023 (actual) · 2024 KFF estimate · 2027 post-negotiation scenarios</div>
+    <div class="cw-tall"><canvas id="cProjection"></canvas></div>
+  </div>
+</div>
+
+<div class="g3">
+  <div class="card">
+    <div class="ct">Why Spending is Rising</div>
+    <div class="cs">Three compounding drivers</div>
+    <div style="margin-top:8px">
+      <div style="margin-bottom:14px">
+        <div style="font-size:12px;font-weight:700;color:#0A2342;margin-bottom:4px">1. Utilization — more beneficiaries</div>
+        <div style="font-size:11px;color:#555;line-height:1.5">Ozempic enrollees: 142K (2019) → 1.5M (2023) → 2M (2024). Medicare Part D enrollment grew only 12% in the same period — GLP-1 growth is driven by adoption, not population growth.</div>
+      </div>
+      <div style="margin-bottom:14px">
+        <div style="font-size:12px;font-weight:700;color:#C0392B;margin-bottom:4px">2. Price — high list prices, rising annually</div>
+        <div style="font-size:11px;color:#555;line-height:1.5">Ozempic list price: $676 (2017) → $969 (2024). Mounjaro: $974 (2022) → $1,069 (2023). These are list prices; net prices after rebates are lower but rebate data is not publicly available.</div>
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:700;color:#C87000;margin-bottom:4px">3. Indication expansion — more covered uses</div>
+        <div style="font-size:11px;color:#555;line-height:1.5">Ozempic approved for CVD in 2024, expanding the covered patient pool. Obesity coverage still prohibited but BALANCE model (2027) will add a major new indication.</div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ct">Medicare Coverage Rules</div>
+    <div class="cs">What is and isn't covered under current law</div>
+    <div style="margin-top:8px">
+      <div style="background:#e8f4fd;border-radius:6px;padding:10px 12px;margin-bottom:8px">
+        <div style="font-size:11px;font-weight:700;color:#1D6FA4;margin-bottom:3px">✓ COVERED (Part D)</div>
+        <div style="font-size:11px;color:#333;line-height:1.6">Type 2 diabetes (all GLP-1s)<br>Cardiovascular disease risk reduction (Ozempic, Wegovy — 2024)<br>Sleep apnea (Zepbound — 2024)</div>
+      </div>
+      <div style="background:#fdecea;border-radius:6px;padding:10px 12px;margin-bottom:8px">
+        <div style="font-size:11px;font-weight:700;color:#C0392B;margin-bottom:3px">✗ NOT COVERED</div>
+        <div style="font-size:11px;color:#333;line-height:1.6">Obesity / weight loss (SSA § 1860D-2 excludes "agents when used for anorexia, weight loss, or weight gain")</div>
+      </div>
+      <div style="background:#fff8e8;border-radius:6px;padding:10px 12px">
+        <div style="font-size:11px;font-weight:700;color:#C87000;margin-bottom:3px">⏳ PENDING (2027)</div>
+        <div style="font-size:11px;color:#333;line-height:1.6">BALANCE model — voluntary obesity coverage<br>Negotiated price: $274/30-day (Ozempic, Wegovy, Rybelsus)</div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ct">Financial Impact Estimates</div>
+    <div class="cs">If obesity coverage is added under BALANCE</div>
+    <div style="margin-top:8px">
+      <div style="margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #eee">
+        <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Eligible beneficiaries (obesity)</div>
+        <div style="font-size:20px;font-weight:700;color:#C0392B">~14 million</div>
+        <div style="font-size:11px;color:#666">~20% of Medicare beneficiaries diagnosed with obesity</div>
+      </div>
+      <div style="margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #eee">
+        <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">2024 gross GLP-1 spend</div>
+        <div style="font-size:20px;font-weight:700;color:#C0392B">$27.5B</div>
+        <div style="font-size:11px;color:#666">KFF analysis · diabetes + CVD indication only</div>
+      </div>
+      <div>
+        <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Estimated net spend (after ~50% rebates)</div>
+        <div style="font-size:20px;font-weight:700;color:#C87000">~$14B</div>
+        <div style="font-size:11px;color:#666">MedPAC: rebates ≥50% for diabetes drugs in 2023</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="rec">
+  <div class="rec-tag">So What — Implications for Health Plan Analytics</div>
+  <p>GLP-1 spending is the defining drug trend in Medicare Part D for 2020–2030. <strong>Three signals health analytics teams should monitor:</strong> (1) <strong>Indication creep</strong> — as CVD and sleep apnea coverage expands, the covered population grows without any change in obesity rules; watch claims with newly-eligible ICD-10 codes (I10–I15, G47). (2) <strong>Rebate opacity</strong> — all publicly-reported figures are gross; net spending after manufacturer rebates is estimated at 40–50% lower, which changes the cost-effectiveness calculation for plan formulary decisions. (3) <strong>BALANCE model 2027</strong> — voluntary but likely to accelerate utilization substantially; plans should model their GLP-1 cost exposure scenarios now using current enrollment + estimated obesity prevalence. For a health plan like TRS serving ~250K active and retired members, a 5% uptake rate at $274/month = <strong>~$41M additional annual drug spend</strong>.</p>
+</div>
+
+</div><!-- /policy -->
+
+<footer>Source: CMS Medicare Part D Spending by Drug (2019–2023) · KFF Analysis (Jan 2026) · HHS OIG Audit (Feb 2025) · AJMC Analysis (Mar 2026) · All figures are gross spending; does not reflect manufacturer rebates &nbsp;|&nbsp; Portfolio project — Albert King Salu · Health Data Analytics</footer>
+</div>
+
+<script>
+// ── COLORS ─────────────────────────────────────────────────────────────────
+const C={
+  ozempic:'#E8721F',  rybelsus:'#1D9E75', mounjaro:'#C87000',
+  wegovy:'#8B5CF6',   trulicity:'#1D6FA4', victoza:'#2d7d9a',
+  byetta:'#7f8c8d',   novo:'#E8721F',      lilly:'#1D6FA4', az:'#1B6B40'
+};
+const YEARS=['2019','2020','2021','2022','2023'];
+
+// ── DATA (CMS/KFF/OIG verified) ─────────────────────────────────────────────
+const D={
+  // Gross spending $B — CMS Part D, OIG/KFF analysis
+  ozempic:  [0.552, 1.3,  2.6,  4.6,  9.2 ],
+  rybelsus: [0.001, 0.15, 0.55, 1.0,  1.7 ],
+  mounjaro: [0,     0,    0,    0.28, 2.1  ],
+  wegovy:   [0,     0,    0.04, 0.11, 0.37 ],
+  trulicity:[4.1,   4.9,  5.2,  5.8,  7.2  ],
+  victoza:  [2.4,   2.2,  1.9,  1.7,  1.8  ],
+  byetta:   [0.4,   0.3,  0.2,  0.15, 0.1  ],
+  // Ozempic beneficiaries (millions)
+  ozBenes:  [0.142, 0.35, 0.65, 1.05, 1.49 ],
+  // Projection (gross GLP-1 total $B)
+  projYears:['2019','2020','2021','2022','2023','2024','2025','2026','2027'],
+  projActual:[7.5,  8.85, 10.5, 13.6, 22.5, 27.5, null, null, null],
+  projBase:  [null, null, null, null, null, null, 38, 52, 68],
+  projNeg:   [null, null, null, null, null, null, 32, 40, 45]
+};
+
+// Totals by year
+D.totals=YEARS.map((_,i)=>+(D.ozempic[i]+D.rybelsus[i]+D.mounjaro[i]+D.wegovy[i]+D.trulicity[i]+D.victoza[i]+D.byetta[i]).toFixed(2));
+D.newGen=YEARS.map((_,i)=>+(D.ozempic[i]+D.rybelsus[i]+D.mounjaro[i]+D.wegovy[i]).toFixed(2));
+D.legacy=YEARS.map((_,i)=>+(D.trulicity[i]+D.victoza[i]+D.byetta[i]).toFixed(2));
+
+// ── CHART DEFAULTS ──────────────────────────────────────────────────────────
+Chart.defaults.font.family='Segoe UI,system-ui,sans-serif';
+Chart.defaults.font.size=11;
+Chart.defaults.color='#555';
+const charts={};
+
+// ── CHART 1: Total Spending Bar ─────────────────────────────────────────────
+charts.total=new Chart(document.getElementById('cTotal'),{
+  type:'bar',
+  data:{labels:YEARS,datasets:[
+    {label:'New Gen (Ozempic+Rybelsus+Mounjaro+Wegovy)',data:D.newGen,backgroundColor:'#E8721F',borderRadius:3,stack:'s'},
+    {label:'Legacy (Trulicity+Victoza+Byetta)',data:D.legacy,backgroundColor:'#1D6FA4bb',borderRadius:3,stack:'s'}
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:true,position:'top',labels:{usePointStyle:true,pointStyleWidth:8,boxHeight:7,font:{size:10}}},
+      tooltip:{callbacks:{label:c=>`${c.dataset.label}: $${c.parsed.y.toFixed(1)}B`}}},
+    scales:{x:{grid:{display:false},stacked:true},y:{stacked:true,ticks:{callback:v=>`$${v}B`},title:{display:true,text:'Gross Spending ($B)',font:{size:10}}}}}
+});
+
+// ── CHART 2: Stacked area by drug ───────────────────────────────────────────
+const legendEl=document.getElementById('drugLegend');
+const drugs=[
+  {k:'ozempic',l:'Ozempic'},{k:'rybelsus',l:'Rybelsus'},{k:'mounjaro',l:'Mounjaro'},
+  {k:'wegovy',l:'Wegovy'},{k:'trulicity',l:'Trulicity'},{k:'victoza',l:'Victoza'}
+];
+drugs.forEach(d=>{
+  const div=document.createElement('div');div.className='dl-item';
+  div.innerHTML=`<div class="dl-dot" style="background:${C[d.k]}"></div>${d.l}`;
+  legendEl.appendChild(div);
+});
+charts.stacked=new Chart(document.getElementById('cStacked'),{
+  type:'line',
+  data:{labels:YEARS,datasets:drugs.map(d=>({
+    label:d.l,data:D[d.k],borderColor:C[d.k],backgroundColor:C[d.k]+'30',
+    fill:true,tension:.3,pointRadius:3,borderWidth:2
+  }))},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.dataset.label}: $${c.parsed.y.toFixed(2)}B`}}},
+    scales:{x:{grid:{display:false}},y:{ticks:{callback:v=>`$${v}B`}}}}
+});
+
+// ── CHART 3: Ozempic dual axis ──────────────────────────────────────────────
+charts.ozdual=new Chart(document.getElementById('cOzDual'),{
+  type:'bar',
+  data:{labels:YEARS,datasets:[
+    {label:'Beneficiaries (M)',data:D.ozBenes,backgroundColor:'#1D6FA4aa',borderRadius:3,yAxisID:'y2',order:2},
+    {label:'Gross Spending ($B)',data:D.ozempic,borderColor:C.ozempic,backgroundColor:'transparent',type:'line',tension:.3,pointRadius:4,borderWidth:2.5,pointBackgroundColor:C.ozempic,yAxisID:'y',order:1}
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:true,position:'top',labels:{usePointStyle:true,pointStyleWidth:8,boxHeight:7,font:{size:10}}},
+      tooltip:{callbacks:{label:c=>c.datasetIndex===0?`Enrollees: ${(c.parsed.y*1e6).toLocaleString()}M`:`Spending: $${c.parsed.y.toFixed(1)}B`}}},
+    scales:{
+      x:{grid:{display:false}},
+      y:{position:'left',ticks:{callback:v=>`$${v}B`},title:{display:true,text:'Spending ($B)',font:{size:10}}},
+      y2:{position:'right',grid:{drawOnChartArea:false},ticks:{callback:v=>`${v}M`},title:{display:true,text:'Enrollees (M)',font:{size:10}}}
+    }}
+});
+
+// ── CHART 4: Share 100% stacked ─────────────────────────────────────────────
+const shareNew=YEARS.map((_,i)=>+(D.newGen[i]/D.totals[i]*100).toFixed(1));
+const shareLeg=YEARS.map((_,i)=>+(D.legacy[i]/D.totals[i]*100).toFixed(1));
+charts.share=new Chart(document.getElementById('cShare'),{
+  type:'bar',
+  data:{labels:YEARS,datasets:[
+    {label:'New Gen',data:shareNew,backgroundColor:C.ozempic,borderRadius:3,stack:'s'},
+    {label:'Legacy',data:shareLeg,backgroundColor:C.trulicity+'aa',borderRadius:3,stack:'s'}
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:true,position:'top',labels:{usePointStyle:true,pointStyleWidth:8,boxHeight:7,font:{size:10}}},
+      tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${c.parsed.y.toFixed(1)}%`}}},
+    scales:{x:{grid:{display:false},stacked:true},y:{stacked:true,max:100,ticks:{callback:v=>`${v}%`},title:{display:true,text:'% of GLP-1 Spend',font:{size:10}}}}}
+});
+
+// ── CHART 5: Per-drug trend (By Drug tab) ────────────────────────────────────
+charts.perdrug=new Chart(document.getElementById('cPerDrug'),{
+  type:'line',
+  data:{labels:YEARS,datasets:[
+    {label:'Ozempic',data:D.ozempic,borderColor:C.ozempic,backgroundColor:C.ozempic+'18',pointBackgroundColor:C.ozempic,pointRadius:4,tension:.3,fill:false},
+    {label:'Rybelsus',data:D.rybelsus,borderColor:C.rybelsus,pointBackgroundColor:C.rybelsus,pointRadius:4,tension:.3,fill:false},
+    {label:'Mounjaro',data:D.mounjaro,borderColor:C.mounjaro,pointBackgroundColor:C.mounjaro,pointRadius:4,tension:.3,fill:false},
+    {label:'Trulicity',data:D.trulicity,borderColor:C.trulicity,pointBackgroundColor:C.trulicity,pointRadius:4,tension:.3,fill:false},
+    {label:'Victoza',data:D.victoza,borderColor:C.victoza,pointBackgroundColor:C.victoza,pointRadius:4,tension:.3,fill:false}
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:true,position:'top',labels:{usePointStyle:true,pointStyleWidth:8,boxHeight:7,font:{size:10}}},
+      tooltip:{callbacks:{label:c=>`${c.dataset.label}: $${c.parsed.y.toFixed(2)}B`}}},
+    scales:{x:{grid:{display:false}},y:{ticks:{callback:v=>`$${v}B`},title:{display:true,text:'Gross Spending ($B)',font:{size:10}}}}}
+});
+
+// ── CHART 6: 2023 Pie ────────────────────────────────────────────────────────
+charts.pie=new Chart(document.getElementById('cPie'),{
+  type:'doughnut',
+  data:{
+    labels:['Ozempic','Trulicity','Mounjaro','Victoza','Rybelsus','Wegovy','Other'],
+    datasets:[{data:[9.2,7.2,2.1,1.8,1.7,0.37,0.13],
+      backgroundColor:[C.ozempic,C.trulicity,C.mounjaro,C.victoza,C.rybelsus,'#8B5CF6','#aaa'],
+      borderWidth:2,borderColor:'#fff'}]
+  },
+  options:{responsive:true,maintainAspectRatio:false,cutout:'60%',
+    plugins:{legend:{display:true,position:'right',labels:{font:{size:10},padding:10,usePointStyle:true}},
+      tooltip:{callbacks:{label:c=>`${c.label}: $${c.parsed.toFixed(2)}B (${(c.parsed/22.5*100).toFixed(1)}%)`}}}}
+});
+
+// ── CHART 7: Manufacturer bar ────────────────────────────────────────────────
+charts.mfr=new Chart(document.getElementById('cMfr'),{
+  type:'bar',
+  data:{labels:YEARS,datasets:[
+    {label:'Novo Nordisk (Ozempic+Rybelsus+Victoza+Wegovy)',data:YEARS.map((_,i)=>+(D.ozempic[i]+D.rybelsus[i]+D.victoza[i]+D.wegovy[i]).toFixed(2)),backgroundColor:C.ozempic,borderRadius:3,stack:'s'},
+    {label:'Eli Lilly (Trulicity+Mounjaro)',data:YEARS.map((_,i)=>+(D.trulicity[i]+D.mounjaro[i]).toFixed(2)),backgroundColor:C.trulicity,borderRadius:3,stack:'s'},
+    {label:'AstraZeneca (Byetta/Bydureon)',data:D.byetta,backgroundColor:C.az+'aa',borderRadius:3,stack:'s'}
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:true,position:'top',labels:{usePointStyle:true,pointStyleWidth:8,boxHeight:7,font:{size:10}}},
+      tooltip:{callbacks:{label:c=>`${c.dataset.label}: $${c.parsed.y.toFixed(2)}B`}}},
+    scales:{x:{grid:{display:false},stacked:true},y:{stacked:true,ticks:{callback:v=>`$${v}B`}}}}
+});
+
+// ── CHART 8: Policy projection ────────────────────────────────────────────────
+charts.proj=new Chart(document.getElementById('cProjection'),{
+  type:'line',
+  data:{labels:D.projYears,datasets:[
+    {label:'Actual (GLP-1 gross)',data:D.projActual,borderColor:C.ozempic,backgroundColor:C.ozempic+'18',pointBackgroundColor:C.ozempic,pointRadius:5,tension:.3,fill:true},
+    {label:'Projected (no policy change)',data:D.projBase,borderColor:'#C0392B',borderDash:[5,4],pointBackgroundColor:'#C0392B',pointRadius:4,tension:.3,fill:false},
+    {label:'Projected (w/ negotiated price ~2027)',data:D.projNeg,borderColor:C.rybelsus,borderDash:[5,4],pointBackgroundColor:C.rybelsus,pointRadius:4,tension:.3,fill:false}
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:true,position:'top',labels:{usePointStyle:true,pointStyleWidth:8,boxHeight:7,font:{size:10}}},
+      tooltip:{callbacks:{label:c=>`${c.dataset.label}: $${c.parsed.y?.toFixed(0)??'—'}B`}}},
+    scales:{x:{grid:{display:false}},y:{ticks:{callback:v=>`$${v}B`},title:{display:true,text:'Gross Spending ($B)',font:{size:10}}}}}
+});
+
+// ── POLICY TIMELINE ────────────────────────────────────────────────────────
+const events=[
+  {y:'2010',c:C.victoza,t:'<strong>Victoza approved</strong> — liraglutide injection, T2D. First major GLP-1 in Part D.'},
+  {y:'2017',c:C.ozempic,t:'<strong>Ozempic approved</strong> (Dec) — semaglutide injection for T2D. Medicare coverage begins 2018.'},
+  {y:'2019',c:C.rybelsus,t:'<strong>Rybelsus approved</strong> (Sep) — first oral GLP-1 for T2D. Spending: &lt;$1M in partial year.'},
+  {y:'2021',c:'#8B5CF6',t:'<strong>Wegovy approved</strong> (Jun) — semaglutide for obesity. Medicare <em>cannot</em> cover for weight loss under SSA § 1860D-2.'},
+  {y:'2022',c:C.mounjaro,t:'<strong>Mounjaro approved</strong> (May) — tirzepatide for T2D (GIP+GLP-1 dual agonist). Part D coverage begins. Spending reaches $280M in partial year.'},
+  {y:'2023',c:'#C0392B',t:'<strong>IRA drug price negotiation</strong> begins. Ozempic ranks #6 in Part D spend at $9.2B. OIG projects 10-drug spend hits $102B by 2026.'},
+  {y:'2024',c:C.ozempic,t:'<strong>Ozempic/Wegovy approved for CVD</strong> (Mar). Medicare coverage expands. 2M enrollees on Ozempic. Total GLP-1 spend: $27.5B gross.'},
+  {y:'2025',c:'#1D6FA4',t:'<strong>CMS selects Ozempic/Rybelsus/Wegovy</strong> for 2nd round IRA negotiation. Negotiated price: $274/30-day. Effective 2027.'},
+  {y:'2027',c:C.rybelsus,t:'<strong>BALANCE model + negotiated price</strong> effective. Voluntary obesity coverage under Medicare. Eli Lilly (Mounjaro negotiation round 3 — dulaglutide/Trulicity from round 2).'}
+];
+const tl=document.getElementById('policyTimeline');
+events.forEach(e=>{
+  tl.innerHTML+=`<div class="tl-item"><div class="tl-dot" style="color:${e.c};background:${e.c}"></div><span class="tl-year">${e.y}</span><span class="tl-text">${e.t}</span></div>`;
+});
+
+// ── TABS ────────────────────────────────────────────────────────────────────
+function showSection(id){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('s-'+id).classList.add('active');
+  event.target.classList.add('active');
+  Object.values(charts).forEach(c=>c.resize());
+}
+</script>
+</body>
+</html>
