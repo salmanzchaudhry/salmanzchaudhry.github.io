@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PL-300 Power BI Study Guide | Salman Chaudhry</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #f9f9f7; font-family: system-ui, sans-serif; padding: 0; }
+    #root { max-width: 760px; margin: 0 auto; padding: 20px 16px 40px; }
+    .nav-bar { background: rgba(255,252,242,.95); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(64,61,57,.12); padding: .9rem 1.5rem; position: sticky; top: 0; z-index: 50; display: flex; align-items: center; justify-content: space-between; }
+    .nav-bar a { font-family: 'Space Mono', monospace; font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; color: #eb5e28; text-decoration: none; }
+    .nav-bar a:last-child { color: #8a8077; }
+    .nav-bar a:last-child:hover { color: #eb5e28; }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="nav-bar">
+    <a href="index.html">$ salman.exe</a>
+    <a href="index.html">← Back to Portfolio</a>
+  </div>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState } = React;
+
+    const C = {
+      blue:   { bg:"#F0F9FF", border:"#0369A1", header:"#075985", text:"#0C4A6E", badge:"#0284C7", badgeText:"#F0F9FF" },
+      purple: { bg:"#EEEDFE", border:"#534AB7", header:"#3C3489", text:"#26215C", badge:"#7F77DD", badgeText:"#EEEDFE" },
+      teal:   { bg:"#E1F5EE", border:"#0F6E56", header:"#085041", text:"#04342C", badge:"#1D9E75", badgeText:"#E1F5EE" },
+      coral:  { bg:"#FAECE7", border:"#993C1D", header:"#712B13", text:"#4A1B0C", badge:"#D85A30", badgeText:"#FAECE7" },
+      amber:  { bg:"#FAEEDA", border:"#854F0B", header:"#633806", text:"#412402", badge:"#BA7517", badgeText:"#FAEEDA" },
+      slate:  { bg:"#F1EFE8", border:"#5F5E5A", header:"#444441", text:"#2C2C2A", badge:"#888780", badgeText:"#F1EFE8" },
+    };
+
+    const Tip = ({children}) => (
+      <div style={{margin:"10px 0",padding:"10px 12px",background:"#FAEEDA",borderLeft:"4px solid #BA7517",borderRadius:"0 6px 6px 0"}}>
+        <span style={{fontWeight:500,color:"#633806",fontSize:13}}>⚡ Exam tip: </span>
+        <span style={{color:"#412402",fontSize:13}}>{children}</span>
+      </div>
+    );
+
+    const Memory = ({children}) => (
+      <div style={{margin:"10px 0",padding:"10px 12px",background:"#E1F5EE",borderLeft:"4px solid #0F6E56",borderRadius:"0 6px 6px 0"}}>
+        <span style={{fontWeight:500,color:"#085041",fontSize:13}}>🧠 Remember: </span>
+        <span style={{color:"#04342C",fontSize:13}}>{children}</span>
+      </div>
+    );
+
+    const SH = ({children,color="blue"}) => (
+      <h3 style={{fontSize:14,fontWeight:500,margin:"18px 0 8px",padding:"6px 12px",background:C[color].bg,borderLeft:`4px solid ${C[color].border}`,borderRadius:"0 6px 6px 0",color:C[color].header}}>
+        {children}
+      </h3>
+    );
+
+    const T = ({headers,rows,color="blue"}) => (
+      <div style={{overflowX:"auto",margin:"8px 0"}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:12}}>
+          <thead>
+            <tr>{headers.map((h,i)=><th key={i} style={{background:C[color].badge,color:C[color].badgeText,padding:"6px 10px",textAlign:"left",fontWeight:500}}>{h}</th>)}</tr>
+          </thead>
+          <tbody>
+            {rows.map((row,i)=>(
+              <tr key={i} style={{background:i%2===0?"#fff":C[color].bg}}>
+                {row.map((cell,j)=><td key={j} style={{padding:"5px 10px",borderBottom:"0.5px solid #e5e5e5",color:"#333",verticalAlign:"top"}}>{cell}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+
+    const QCheck = ({qs,as}) => {
+      const [show,setShow] = useState(false);
+      return (
+        <div style={{margin:"16px 0",padding:"14px",background:"#EEEDFE",border:"0.5px solid #534AB7",borderRadius:8}}>
+          <div style={{fontWeight:500,color:"#3C3489",fontSize:13,marginBottom:8}}>📝 Quick-check questions</div>
+          <ol style={{margin:"0 0 10px",paddingLeft:20,color:"#26215C",fontSize:13,lineHeight:1.7}}>
+            {qs.map((q,i)=><li key={i}>{q}</li>)}
+          </ol>
+          <button onClick={()=>setShow(!show)} style={{fontSize:12,color:"#534AB7",background:"transparent",border:"0.5px solid #534AB7",borderRadius:4,padding:"3px 10px",cursor:"pointer"}}>
+            {show?"▲ Hide answers":"▶ Reveal answers"}
+          </button>
+          {show&&(
+            <ol style={{margin:"10px 0 0",paddingLeft:20,color:"#27500A",fontSize:13,lineHeight:1.7,background:"#EAF3DE",padding:"10px 10px 10px 28px",borderRadius:6}}>
+              {as.map((a,i)=><li key={i}>{a}</li>)}
+            </ol>
+          )}
+        </div>
+      );
+    };
+
+    const Mono = ({children}) => (
+      <div style={{background:"#1e1e2e",color:"#cdd6f4",padding:"10px 14px",borderRadius:6,fontFamily:"monospace",fontSize:12,lineHeight:1.7,margin:"8px 0",overflowX:"auto",whiteSpace:"pre"}}>
+        {children}
+      </div>
+    );
+
+    const Highlight = ({color="blue",children}) => (
+      <div style={{padding:"10px 14px",background:C[color].bg,border:`0.5px solid ${C[color].border}`,borderRadius:6,fontSize:13,color:C[color].text,margin:"8px 0"}}>
+        {children}
+      </div>
+    );
+
+    function D1() {
+      return (
+        <div>
+          <SH color="blue">1.1 — Connectivity modes</SH>
+          <Tip>This topic appears on almost every PL-300 exam. Know the trade-offs cold.</Tip>
+          <T color="blue" headers={["Mode","How it works","Best for","Limitation"]} rows={[
+            ["Import","Data copied into Power BI model","Most common; fastest queries","Needs refresh; ~1 GB model limit (Pro)"],
+            ["DirectQuery","Queries sent live to source at render time","Real-time data; very large datasets","Slower; limited transformations supported"],
+            ["Live Connection","Connects to published dataset or SSAS","Shared semantic models","No local model changes allowed"],
+            ["DirectLake","Reads Parquet/delta files directly from OneLake","Microsoft Fabric — large-scale","Fabric-only; falls back to DQ automatically"],
+          ]} />
+          <Highlight color="blue">
+            <strong>Decision rule:</strong> Data in Fabric OneLake → DirectLake. Need real-time → DirectQuery. Dataset &gt;1 GB → DirectQuery. Everything else → Import (best performance). Connecting to published PBI dataset → Live Connection.
+          </Highlight>
+          <SH color="blue">1.2 — Parameters</SH>
+          <T color="blue" headers={["Parameter type","Use case"]} rows={[
+            ["Text / Number / Date","Dynamic file paths, switchable data sources, filter values"],
+            ["What-if parameter","Creates a slicer-driven numeric input for DAX calculations — generates a calculated table + measure"],
+            ["Query parameter","Passed into M queries to make them reusable across environments (dev/prod)"],
+          ]} />
+          <SH color="blue">1.3 — Data source settings & privacy levels</SH>
+          <T color="blue" headers={["Privacy level","Behavior"]} rows={[
+            ["None","No restriction — default; may expose data across sources"],
+            ["Public","Data is publicly available; can combine freely"],
+            ["Organizational","Can combine with other organizational sources safely"],
+            ["Private","Cannot be shared with any other data source during query folding"],
+          ]} />
+          <Tip>Privacy levels prevent accidental data leakage when combining sources. If set incorrectly, Power BI may block query folding or refuse to combine queries.</Tip>
+          <SH color="blue">1.4 — Power Query profiling tools</SH>
+          <T color="blue" headers={["Tool","What it shows","Where to find"]} rows={[
+            ["Column quality","% Valid, Error, Empty for each column","View tab → Column quality"],
+            ["Column distribution","Distinct vs. unique value counts; bar chart of frequencies","View tab → Column distribution"],
+            ["Column profile","Detailed stats: min, max, avg, std dev, nulls, errors","View tab → Column profile"],
+          ]} />
+          <Memory>Default profiling = top 1,000 rows. Click the status bar text to switch to profiling the entire dataset.</Memory>
+          <SH color="blue">1.5 — Key transformations</SH>
+          <T color="blue" headers={["Transform","When to use"]} rows={[
+            ["Unpivot columns","Year columns (2021, 2022, 2023) should be rows — unpivot makes data model-ready"],
+            ["Pivot column","Turn row values into column headers (wide format)"],
+            ["Transpose","Flip entire rows and columns — use rarely"],
+            ["Group By","Aggregate rows: Sum, Count, Average, Min, Max"],
+            ["Split column","Separate one column into multiple by delimiter or character count"],
+            ["Merge queries","JOIN — combine columns from two tables on matching key"],
+            ["Append queries","UNION — stack rows from two or more tables vertically"],
+            ["Expand record/list","Unpack nested JSON or XML fields into flat columns"],
+          ]} />
+          <Tip>Unpivot is the most tested transformation. If data has columns that are really values (years, months, products as headers) → select those columns → Unpivot.</Tip>
+          <SH color="blue">1.6 — Reference vs. duplicate queries</SH>
+          <T color="blue" headers={["","Reference","Duplicate"]} rows={[
+            ["What it is","Linked pointer to original query","Full independent copy"],
+            ["If original changes","Changes flow through automatically","Not affected — fully independent"],
+            ["Use when","Building a fact + dimension from same source","Need a completely separate version"],
+          ]} />
+          <SH color="blue">1.7 — Fact tables vs. dimension tables</SH>
+          <T color="blue" headers={["","Fact table","Dimension table"]} rows={[
+            ["Contains","Numeric measures + foreign keys","Descriptive attributes + primary key"],
+            ["Size","Very large (millions of rows)","Small (hundreds to thousands of rows)"],
+            ["Shape","Long and narrow","Short and wide"],
+            ["Examples","Sales, Orders, Events, Transactions","Customer, Product, Date, Store, Employee"],
+          ]} />
+          <QCheck
+            qs={[
+              "What connectivity mode reads Parquet files directly from OneLake without importing?",
+              "Columns named '2021', '2022', '2023' each hold revenue values. What transformation makes this model-ready?",
+              "What's the difference between Reference and Duplicate queries?",
+              "A Privacy level is set to Private on a data source. What does this prevent?",
+              "Column profiling shows '15% Error' on a column. What tab in Power Query shows this?",
+            ]}
+            as={[
+              "DirectLake — Fabric-only; fastest; falls back to DirectQuery if needed.",
+              "Unpivot those year columns — turns them into rows with a Year attribute column.",
+              "Reference is linked to the source query (changes flow through). Duplicate is independent.",
+              "That source's data cannot be combined with any other data source during query folding.",
+              "View tab → Column quality.",
+            ]}
+          />
+        </div>
+      );
+    }
+
+    function D2() {
+      return (
+        <div>
+          <SH color="purple">2.1 — Star schema fundamentals</SH>
+          <Highlight color="purple">
+            <strong>Star schema = fact table at center + dimension tables surrounding it.</strong> Always prefer star over snowflake in Power BI — flatten dimensions. Benefits: simpler DAX, faster queries, easier to understand.
+          </Highlight>
+          <T color="purple" headers={["Relationship property","Options","Recommendation"]} rows={[
+            ["Cardinality","One-to-many (1:*), One-to-one (1:1), Many-to-many (*:*)","Use 1:* wherever possible"],
+            ["Cross-filter direction","Single (one → many), Both (bidirectional)","Single is safer; Both causes ambiguity risks"],
+            ["Active vs. inactive","One active relationship per table pair","Use USERELATIONSHIP() to activate others"],
+          ]} />
+          <Tip>Bidirectional relationships can cause circular dependency errors and slow performance. Prefer Single direction + CROSSFILTER() or USERELATIONSHIP() in DAX when needed.</Tip>
+          <SH color="purple">2.2 — Role-playing dimensions</SH>
+          <T color="purple" headers={["Scenario","Solution"]} rows={[
+            ["One fact table has OrderDate, ShipDate, DueDate — all need date dimension","Create one active relationship (e.g., OrderDate) + inactive relationships for others"],
+            ["Using inactive relationship in a measure","USERELATIONSHIP(Sales[ShipDate], Date[Date]) inside CALCULATE"],
+            ["Alt: multiple date table copies","Create Date_Order, Date_Ship, Date_Due — simpler but redundant storage"],
+          ]} />
+          <Mono>{"Ship Revenue = \nCALCULATE(\n    [Total Revenue],\n    USERELATIONSHIP(Sales[ShipDate], Date[Date])\n)"}</Mono>
+          <SH color="purple">2.3 — Date table requirements</SH>
+          <T color="purple" headers={["Requirement","Detail"]} rows={[
+            ["No gaps","Must contain every date in the range — no missing days"],
+            ["Data type","Date column must be Date type (not DateTime)"],
+            ["Mark as date table","Table tools → Mark as date table → select Date column"],
+            ["Relationship","Must connect to fact table on the date column"],
+            ["Generation options","DAX: CALENDAR(), CALENDARAUTO() | Power Query | M script | Import from source"],
+          ]} />
+          <Mono>{"Date Table = \nADDCOLUMNS(\n    CALENDAR(DATE(2020,1,1), DATE(2030,12,31)),\n    \"Year\", YEAR([Date]),\n    \"Month Num\", MONTH([Date]),\n    \"Month Name\", FORMAT([Date], \"MMMM\"),\n    \"Quarter\", \"Q\" & QUARTER([Date]),\n    \"Day of Week\", FORMAT([Date], \"dddd\")\n)"}</Mono>
+          <Tip>Time intelligence functions (TOTALYTD, SAMEPERIODLASTYEAR, etc.) REQUIRE a properly marked date table with no gaps. This is the #1 model exam gotcha.</Tip>
+          <SH color="purple">2.4 — Calculated columns vs. measures</SH>
+          <T color="purple" headers={["","Calculated column","Measure"]} rows={[
+            ["Evaluated","Row by row at data refresh","Dynamically at query time"],
+            ["Stored in model","Yes — increases model size","No — computed on the fly"],
+            ["Context","Row context","Filter context"],
+            ["Can filter/slice by","Yes — can use in slicers, rows, columns","No — values area only"],
+            ["Example","Profit = Sales[Revenue] - Sales[Cost]","Total Revenue = SUM(Sales[Revenue])"],
+          ]} />
+          <Memory>Need to filter or group by it → calculated column. Need a number that changes with slicer selections → measure.</Memory>
+          <SH color="purple">2.5 — CALCULATE & filter context</SH>
+          <Highlight color="purple">
+            <strong>CALCULATE</strong> is the most important DAX function. It evaluates an expression in a modified filter context. Master this and half the DAX exam is done.
+          </Highlight>
+          <Mono>{"-- Basic: filter to one category\nElectronics Sales = \nCALCULATE(SUM(Sales[Amount]), Products[Category] = \"Electronics\")\n\n-- Remove all year filters (% of grand total)\n% of Total = \nDIVIDE(\n    SUM(Sales[Amount]),\n    CALCULATE(SUM(Sales[Amount]), ALL(Sales))\n)\n\n-- Keep slicer filters but remove model filters\nSales Selected = CALCULATE([Total Sales], ALLSELECTED(Sales))"}</Mono>
+          <T color="purple" headers={["Modifier","Effect"]} rows={[
+            ["ALL(table)","Remove all filters on entire table"],
+            ["ALL(table[col])","Remove filters on specific column only"],
+            ["ALLEXCEPT(table, col)","Remove all filters EXCEPT the specified column"],
+            ["ALLSELECTED()","Remove model filters but keep slicer/visual filters"],
+            ["KEEPFILTERS()","Add filter without overriding existing filter context"],
+            ["REMOVEFILTERS()","Explicit version of ALL — clearer intent"],
+          ]} />
+          <SH color="purple">2.6 — Time intelligence functions</SH>
+          <Mono>{"Sales YTD   = TOTALYTD(SUM(Sales[Amount]), Date[Date])\nSales QTD   = TOTALQTD(SUM(Sales[Amount]), Date[Date])\nSales MTD   = TOTALMTD(SUM(Sales[Amount]), Date[Date])\nSales LY    = CALCULATE([Total Sales], SAMEPERIODLASTYEAR(Date[Date]))\nYoY Change  = [Total Sales] - [Sales LY]\nYoY %       = DIVIDE([YoY Change], [Sales LY])\nSales PM    = CALCULATE([Total Sales], PREVIOUSMONTH(Date[Date]))\nSales -3M   = CALCULATE([Total Sales], DATEADD(Date[Date], -3, MONTH))"}</Mono>
+          <SH color="purple">2.7 — Semi-additive measures</SH>
+          <T color="purple" headers={["Measure type","Behavior","Example"]} rows={[
+            ["Additive","SUM across all dimensions is correct","Revenue, Quantity, Cost"],
+            ["Semi-additive","Should NOT be summed across time — use last value","Inventory balance, headcount, bank balance"],
+            ["Non-additive","Cannot sum meaningfully","Ratios, percentages, prices"],
+          ]} />
+          <Mono>{"-- WRONG for inventory: SUM double-counts across days\n-- RIGHT: last value in period\nInventory Balance = \nCALCULATE(\n    LASTNONBLANK(Inventory[Balance], 1),\n    DATESYTD(Date[Date])\n)"}</Mono>
+          <SH color="purple">2.8 — Key DAX functions reference</SH>
+          <T color="purple" headers={["Function","Purpose"]} rows={[
+            ["SUM / SUMX","Total | row-by-row calculated total (SUMX is iterator)"],
+            ["CALCULATE","Modify filter context — the most important function"],
+            ["DIVIDE(num, den, alt)","Safe division — returns alt if denominator is 0"],
+            ["IF / SWITCH(TRUE(), ...)","Conditional logic"],
+            ["RELATED(col)","Look up single value from related table (row context)"],
+            ["RELATEDTABLE(table)","Return all related rows from another table"],
+            ["SELECTEDVALUE(col, alt)","Returns selected value from slicer, or alt if multiple selected"],
+            ["HASONEVALUE(col)","TRUE if exactly one value is selected — used for conditional measures"],
+            ["RANKX(table, expr)","Rank within a table"],
+            ["TOPN(n, table, expr)","Return top N rows from a table"],
+            ["USERELATIONSHIP(col1, col2)","Activate an inactive relationship inside CALCULATE"],
+            ["CROSSFILTER(col1, col2, dir)","Change filter direction inside a measure"],
+            ["BLANK() / ISBLANK()","Return or test for blank (not zero)"],
+            ["FORMAT(value, format)","Convert to text with formatting — breaks numeric aggregation"],
+          ]} />
+          <SH color="purple">2.9 — Performance optimization</SH>
+          <T color="purple" headers={["Issue","Cause","Fix"]} rows={[
+            ["Slow DAX query","Complex measure, FILTER(ALL(...)) pattern","Use Performance Analyzer; refactor in DAX Studio"],
+            ["Large model size","Too many columns imported; calc columns bloat model","Import only needed columns; prefer measures over calc columns"],
+            ["Broken query folding","Transformation breaks folding (e.g., adding index early)","Check View Native Query; reorder steps"],
+            ["Bidirectional slowdown","Filters propagate both ways — ambiguous paths","Use single direction + USERELATIONSHIP in DAX"],
+            ["High cardinality text key","Long text as relationship key is slow","Use integer surrogate keys"],
+          ]} />
+          <Tip>Performance Analyzer (View tab) shows DAX query time vs. visual render time. Long DAX query time → optimize the measure. Long visual display time → reduce visual complexity.</Tip>
+          <SH color="purple">2.10 — Calculation groups</SH>
+          <Highlight color="purple">
+            Calculation groups apply the same logic (YTD, vs LY, % variance) to ALL measures at once — no need to duplicate DAX per measure. Created in <strong>Tabular Editor</strong> (external tool). Applied via a slicer in the report. Each item in the group is a Calculation Item.
+          </Highlight>
+          <QCheck
+            qs={[
+              "Your fact table has OrderDate and ShipDate. How do you use one Date table for both?",
+              "What's the difference between a calculated column and a measure?",
+              "TOTALYTD requires what setup in the model to work?",
+              "Why is SUM wrong for an inventory balance? What should you use instead?",
+              "Performance Analyzer shows a 3-second 'DAX query' time. Where do you investigate?",
+            ]}
+            as={[
+              "One active relationship (OrderDate); inactive relationship for ShipDate; use USERELATIONSHIP() in measures.",
+              "Calculated columns evaluate row-by-row at refresh and are stored. Measures evaluate dynamically in filter context and aren't stored.",
+              "A properly marked date table with no gaps and a Date-type column.",
+              "SUM across time double-counts inventory. Use LASTNONBLANK or LASTDATE to get the closing balance.",
+              "DAX Studio or DAX Query View — copy the DAX from Performance Analyzer and profile the measure.",
+            ]}
+          />
+        </div>
+      );
+    }
+
+    function D3() {
+      return (
+        <div>
+          <SH color="teal">3.1 — Choosing the right visual</SH>
+          <T color="teal" headers={["Visual","Best for"]} rows={[
+            ["Bar / Column chart","Comparing categories side by side"],
+            ["Line chart","Trends over time"],
+            ["Area chart","Cumulative trends or comparing proportions over time"],
+            ["Scatter chart","Correlation between two measures"],
+            ["Bubble chart","Correlation + third variable encoded as bubble size"],
+            ["Pie / Donut","Part-to-whole — use sparingly; max 5 slices"],
+            ["Map / Filled map","Geographic distribution of data"],
+            ["Matrix","Cross-tabular data; supports drill-down in rows and columns"],
+            ["Card / Multi-row card","Single KPI values or small summary stats"],
+            ["KPI visual","Single value trending toward a goal with status indicator"],
+            ["Treemap","Hierarchical part-to-whole with nested rectangles"],
+            ["Waterfall","Cumulative effect of sequential positive/negative values"],
+            ["Funnel","Sequential stage conversion rates (sales pipeline, etc.)"],
+            ["Gauge","Single value vs. a target — speedometer style"],
+            ["Ribbon chart","Rank changes over time"],
+            ["Decomposition tree","AI-powered drill-down by any dimension in any order"],
+            ["Key influencers","AI — identifies what factors most drive a metric"],
+            ["Smart narrative","Auto-generated text summary with dynamic data values"],
+            ["Q&A visual","Users type natural language questions; Power BI generates visual"],
+          ]} />
+          <SH color="teal">3.2 — Paginated reports</SH>
+          <T color="teal" headers={["Aspect","Detail"]} rows={[
+            ["Created in","Power BI Report Builder (separate app)"],
+            ["Best for","Pixel-perfect layouts, multi-page print, invoices, statements, many rows"],
+            ["Interactivity","Minimal — not interactive like regular reports"],
+            ["Workspace requirement","Premium / PPU workspace to publish and share"],
+            ["When to choose it","User needs to print/export to PDF with exact formatting every time"],
+          ]} />
+          <Tip>"When should you use a paginated report?" → When users need to print with exact layout, or the report spans many pages of tabular data that doesn't fit in a regular visual.</Tip>
+          <SH color="teal">3.3 — Filters, slicers & interactions</SH>
+          <T color="teal" headers={["Mechanism","Scope","Notes"]} rows={[
+            ["Visual-level filter","One visual only","In Filter pane; users may or may not see it"],
+            ["Page-level filter","All visuals on current page","In Filter pane"],
+            ["Report-level filter","All pages in the report","In Filter pane"],
+            ["Slicer","Page or synced across pages","On canvas; visible and interactive for users"],
+            ["Sync slicers","Multiple pages","View → Sync slicers: sync value vs. visible are separate settings"],
+          ]} />
+          <Memory>Sync slicers: a slicer can be synced (shares its value) on a page without being visible on it. Useful for hidden cross-page filters.</Memory>
+          <SH color="teal">3.4 — Bookmarks</SH>
+          <T color="teal" headers={["Type","Who sees it","Use case"]} rows={[
+            ["Report bookmark","All users — saved in the report file","Guided navigation, show/hide panels, toggle between views"],
+            ["Personal bookmark","Individual user only (in service)","Users save their own view state"],
+          ]} />
+          <Highlight color="teal">
+            Bookmarks capture: filter state, page, visual visibility, slicer values. Use them with buttons to create show/hide toggles (Selection pane → hide visual → save bookmark in each state).
+          </Highlight>
+          <SH color="teal">3.5 — Drillthrough vs. drill-down</SH>
+          <T color="teal" headers={["","Drill-down","Drillthrough"]} rows={[
+            ["What it does","Go deeper within same visual's hierarchy","Navigate to a different detail page"],
+            ["Where","Same visual — Year → Quarter → Month","Separate destination page"],
+            ["How to trigger","Click expand arrows on visual","Right-click data point → Drillthrough"],
+            ["Setup","Add hierarchy to visual axis","Add field to Drillthrough well on destination page"],
+            ["Back button","Not needed","Added automatically to destination page"],
+          ]} />
+          <SH color="teal">3.6 — Conditional formatting</SH>
+          <T color="teal" headers={["Type","Description"]} rows={[
+            ["Background color","Highlight cells — by rules, field value, or gradient scale"],
+            ["Font color","Change text color based on value"],
+            ["Data bars","Mini bar charts inside table cells"],
+            ["Icons","Traffic lights, arrows, shapes based on thresholds"],
+            ["Web URL","Turn a column value into a clickable hyperlink"],
+          ]} />
+          <SH color="teal">3.7 — AI visuals & analytics</SH>
+          <T color="teal" headers={["Feature","Purpose","How to access"]} rows={[
+            ["Key influencers","What factors most drive a metric up or down","AI visuals panel"],
+            ["Decomposition tree","Drill into any dimension in any order; AI Split finds best next split","AI visuals panel"],
+            ["Anomaly detection","Auto-detects unusual data points on line charts","Analytics pane → Find anomalies"],
+            ["Forecasting","Projects future trend with confidence interval","Analytics pane → Forecast (line charts only)"],
+            ["Reference lines","Constant, min, max, average, median, percentile lines","Analytics pane"],
+            ["Clustering","Auto-groups scatter chart data points by similarity","Scatter chart → Analytics → Clusters"],
+            ["Smart narrative","Auto-generates dynamic text summary of visuals","Visual gallery → Smart narrative"],
+            ["Copilot (report page)","Suggest or build entire report pages from semantic model","Copilot pane (Premium/Fabric required)"],
+          ]} />
+          <SH color="teal">3.8 — Report usability features</SH>
+          <T color="teal" headers={["Feature","Description"]} rows={[
+            ["Custom tooltips","Design a full report page as a tooltip; hover to reveal","Format → Tooltips → select tooltip page"],
+            ["Edit interactions","Control how visuals filter each other (Filter / Highlight / None)","Format → Edit interactions mode"],
+            ["Selection pane","Layer order, grouping, show/hide visuals","View → Selection pane"],
+            ["Mobile layout","Separate canvas layout for phone view","View → Mobile layout"],
+            ["Auto page refresh","Refreshes page on interval or change detection (DQ/DL only)","Format → Page information → Page refresh"],
+            ["Visual calculations","DAX calculations scoped to visual rows/columns (not stored in model)","Visual → Add calculation button"],
+          ]} />
+          <QCheck
+            qs={[
+              "When should you use a paginated report instead of a regular Power BI report?",
+              "What's the difference between drill-down and drillthrough?",
+              "A slicer on Page 1 should filter Page 3 but not appear on Page 3. How?",
+              "You want a rich mini-chart tooltip when hovering a data point. What do you create?",
+              "What AI visual identifies which factors most influence customer churn?",
+            ]}
+            as={[
+              "When users need pixel-perfect print/export, or the report spans many rows across pages.",
+              "Drill-down goes deeper within the same visual hierarchy. Drillthrough navigates to a separate detail page.",
+              "Sync slicers — sync Page 3 but leave it not visible on Page 3.",
+              "A custom tooltip page — create a new page, set it as Tooltip type, design it, then point visuals to it.",
+              "Key influencers visual.",
+            ]}
+          />
+        </div>
+      );
+    }
+
+    function D4() {
+      return (
+        <div>
+          <SH color="coral">4.1 — Workspace roles</SH>
+          <T color="coral" headers={["Role","Key permissions","Cannot do"]} rows={[
+            ["Admin","Full control: add/remove members, delete workspace, all below","—"],
+            ["Member","Publish content, configure dataflows, create/update apps","Manage roles, delete workspace"],
+            ["Contributor","Create, edit, delete content in workspace","Publish apps, manage roles"],
+            ["Viewer","View and interact with content only","Edit anything, publish, manage"],
+          ]} />
+          <Tip>Only Admin and Member can publish apps. Contributor can edit reports but NOT publish. Viewer is read-only.</Tip>
+          <Memory>Admin → Member → Contributor → Viewer. Each step down loses one major capability. Publish apps = Admin or Member only.</Memory>
+          <SH color="coral">4.2 — Power BI apps</SH>
+          <T color="coral" headers={["Concept","Detail"]} rows={[
+            ["Purpose","Packaged, curated collection of reports/dashboards for consumers"],
+            ["Workspace vs. App","Workspace = for content authors. App = for end consumers. Separate things."],
+            ["Who can publish","Admin or Member role only"],
+            ["Audience settings","Different user groups can see different sections of the same app"],
+            ["Update app","Changes to workspace items must be explicitly published to the app"],
+          ]} />
+          <SH color="coral">4.3 — Distribution methods</SH>
+          <T color="coral" headers={["Method","Best for","Caution"]} rows={[
+            ["Power BI App","Large consumer audience; curated experience","Requires Admin/Member to publish"],
+            ["Share report","Direct sharing with specific individuals; quick","Less governance than apps"],
+            ["Publish to web","Public internet — no authentication required","Anyone on internet can see it — use with extreme caution"],
+            ["Email subscription","Scheduled screenshot snapshots delivered by email","Static — not interactive"],
+            ["Export PDF/PowerPoint","Offline static distribution","Snapshot only — no live data"],
+          ]} />
+          <Tip>"Publish to web" = anonymous public access. Never use for internal or sensitive data.</Tip>
+          <SH color="coral">4.4 — Dashboards vs. reports</SH>
+          <T color="coral" headers={["","Dashboard","Report"]} rows={[
+            ["Pages","Single page only","Multi-page"],
+            ["Source","Multiple reports/datasets (pinned tiles)","One dataset"],
+            ["Created in","Power BI Service only","Power BI Desktop + Service"],
+            ["Interactivity","Limited — click tile → goes to source report","Full: slicers, drillthrough, filters"],
+            ["Alerts","Data alerts on card/KPI/gauge tiles","Not available"],
+          ]} />
+          <SH color="coral">4.5 — Gateways</SH>
+          <T color="coral" headers={["Gateway type","Use case","DirectQuery support"]} rows={[
+            ["Standard (on-premises)","Enterprise; multiple users; on-prem sources","Yes — required for DQ on-prem"],
+            ["Personal mode","Single user; Import only; personal use","No — cannot use with DirectQuery"],
+            ["VNet data gateway","Azure Virtual Network private resources","Yes — no software installation needed"],
+          ]} />
+          <Tip>On-premises database + DirectQuery = Standard gateway required. Personal mode cannot handle DirectQuery.</Tip>
+          <SH color="coral">4.6 — Row-level security (RLS)</SH>
+          <Highlight color="coral">
+            RLS restricts which <strong>rows</strong> a user sees. Configured in Desktop → published to Service → users/groups assigned to roles.
+          </Highlight>
+          <Mono>{"-- Static RLS\n[Region] = \"West\"\n\n-- Dynamic RLS\n[Email] = USERPRINCIPALNAME()"}</Mono>
+          <T color="coral" headers={["Role","RLS applies?"]} rows={[
+            ["Admin","No — bypasses RLS; sees all data"],
+            ["Member","No — bypasses RLS; sees all data"],
+            ["Contributor","No — bypasses RLS; sees all data"],
+            ["Viewer","Yes — subject to RLS roles defined on the dataset"],
+          ]} />
+          <Tip>Workspace Admins, Members, and Contributors bypass RLS entirely. Only Viewers are restricted by RLS roles.</Tip>
+          <SH color="coral">4.7 — Security layers</SH>
+          <T color="coral" headers={["Layer","Tool","What it controls"]} rows={[
+            ["Workspace","Workspace roles","Who can access and edit the workspace"],
+            ["Dataset","Dataset permissions (Read/Build/Reshare)","Who can query the dataset or build new reports from it"],
+            ["Row level","RLS roles","Which rows of data each user can see"],
+            ["Column/table level","OLS (Object-Level Security)","Hides entire tables or columns — requires Tabular Editor"],
+            ["Data classification","Sensitivity labels","MIP labels propagate to Excel exports; compliance tracking"],
+          ]} />
+          <QCheck
+            qs={[
+              "Which workspace role can publish apps but cannot manage workspace roles?",
+              "You need to refresh an on-premises SQL Server via DirectQuery. What is required?",
+              "A Contributor-level user opens a report with RLS configured. Will RLS apply to them?",
+              "What is 'Publish to web' and when should you avoid it?",
+              "What's the difference between Promoted and Certified endorsement?",
+            ]}
+            as={[
+              "Member.",
+              "Standard on-premises data gateway — personal mode cannot support DirectQuery.",
+              "No — Contributors bypass RLS. Only Viewers are subject to RLS.",
+              "Publish to web = anonymous public access, no authentication. Avoid for any internal or sensitive data.",
+              "Promoted = self-endorsed by content owner. Certified = formally approved by admin-designated certifiers.",
+            ]}
+          />
+        </div>
+      );
+    }
+
+    function Ref() {
+      return (
+        <div>
+          <SH color="slate">Connectivity mode decision tree</SH>
+          <div style={{padding:"12px 14px",background:"#F1EFE8",border:"0.5px solid #5F5E5A",borderRadius:6,fontFamily:"monospace",fontSize:12,lineHeight:1.9,color:"#2C2C2A",margin:"8px 0"}}>
+            {`Data in Fabric OneLake (delta/Parquet)? → DirectLake\nNeed real-time data (seconds)?         → DirectQuery\nDataset too large to import (>1 GB)?   → DirectQuery\nConnect to published PBI dataset/SSAS? → Live Connection\nEverything else                        → Import ✓`}
+          </div>
+          <SH color="slate">DAX quick reference</SH>
+          <Mono>{"-- Safe division\nDIVIDE([Num], [Den], 0)\n\n-- Conditional\nIF([Val] > 100, \"High\", \"Low\")\nSWITCH(TRUE(), [V]<10,\"Low\", [V]<50,\"Med\", \"High\")\n\n-- Time intelligence (requires marked date table)\nTOTALYTD([Measure], Date[Date])\nSAMEPERIODLASTYEAR(Date[Date])\nDATEADD(Date[Date], -1, YEAR)\nPREVIOUSMONTH(Date[Date])\n\n-- Filter manipulation\nCALCULATE([Measure], ALL(Table[Column]))\nCALCULATE([Measure], ALLEXCEPT(Table, Table[Col]))\n\n-- Iterator\nSUMX(Sales, Sales[Qty] * Sales[UnitPrice])\n\n-- Lookup\nRELATED(DimTable[Column])\n\n-- Dynamic selection\nSELECTEDVALUE(Table[Column], \"All\")\n\n-- Activate inactive relationship\nCALCULATE([Measure], USERELATIONSHIP(Fact[Col], Dim[Col]))"}</Mono>
+          <SH color="slate">Exam day tips</SH>
+          <div style={{display:"flex",flexDirection:"column",gap:8,marginTop:8}}>
+            {[
+              ["⏱️ Timing","~40–60 questions. Performance-based questions come first — flag if stuck."],
+              ["🔄 Import vs. DirectQuery","Know trade-offs cold. Import = faster queries, needs refresh. DQ = live, slower."],
+              ["📅 Date table","Time intelligence fails without a properly marked date table with no gaps."],
+              ["📊 Measure vs. column","Dynamic aggregation → measure. Filter/slice by it → calculated column."],
+              ["🔐 RLS bypass","Admin/Member/Contributor bypass RLS. Only Viewer is restricted."],
+              ["🏛️ Workspace roles","Member publishes apps. Admin manages roles. Contributor edits. Viewer = read-only."],
+              ["🔌 Gateway","DQ on-premises = standard gateway. Personal mode = Import only."],
+              ["✅ Passing score","700 / 1000. Renew annually via free Microsoft Learn assessment."],
+            ].map(([t,d])=>(
+              <div key={t} style={{padding:"8px 12px",background:"#F1EFE8",border:"0.5px solid #888780",borderRadius:6}}>
+                <div style={{fontSize:13,fontWeight:500,color:"#444441"}}>{t}</div>
+                <div style={{fontSize:12,color:"#5F5E5A",marginTop:2}}>{d}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    function App() {
+      const [active, setActive] = useState(0);
+      const tabs = [
+        { label:"Prepare the Data", sub:"Domain 1", color:"blue", weight:"25–30%", component:<D1/> },
+        { label:"Model the Data", sub:"Domain 2", color:"purple", weight:"25–30%", component:<D2/> },
+        { label:"Visualize & Analyze", sub:"Domain 3", color:"teal", weight:"25–30%", component:<D3/> },
+        { label:"Manage & Secure", sub:"Domain 4", color:"coral", weight:"15–20%", component:<D4/> },
+        { label:"Reference", sub:"DAX & Quick Ref", color:"slate", weight:"", component:<Ref/> },
+      ];
+      return (
+        <div style={{fontFamily:"system-ui,sans-serif",maxWidth:720,margin:"0 auto",padding:"16px 0"}}>
+          <div style={{fontSize:12,color:"#8a8077",margin:"0 0 4px",textTransform:"uppercase",letterSpacing:1}}>Microsoft PL-300</div>
+          <h1 style={{fontSize:22,fontWeight:500,color:"#252422",margin:"0 0 16px"}}>Power BI Data Analyst — Study Guide</h1>
+          <div style={{display:"flex",height:8,borderRadius:4,overflow:"hidden",marginBottom:6}}>
+            {[["blue",30],["purple",30],["teal",30],["coral",20]].map(([c,w])=>(
+              <div key={c} style={{flex:w,background:C[c].badge}} />
+            ))}
+          </div>
+          <div style={{display:"flex",gap:12,marginBottom:14,flexWrap:"wrap"}}>
+            {tabs.slice(0,4).map((t,i)=>(
+              <div key={i} style={{display:"flex",alignItems:"center",gap:4,fontSize:11,color:C[t.color].header}}>
+                <div style={{width:10,height:10,borderRadius:2,background:C[t.color].badge}} />
+                {t.sub} <span style={{opacity:0.7}}>{t.weight}</span>
+              </div>
+            ))}
+          </div>
+          <div style={{display:"flex",flexWrap:"wrap",gap:4,marginBottom:12}}>
+            {tabs.map((t,i)=>(
+              <button key={i} onClick={()=>setActive(i)} style={{
+                padding:"6px 12px",borderRadius:6,cursor:"pointer",fontSize:13,fontWeight:active===i?500:400,
+                background:active===i?C[t.color].badge:C[t.color].bg,
+                color:active===i?C[t.color].badgeText:C[t.color].header,
+                border:`0.5px solid ${C[t.color].border}`,
+              }}>
+                {t.label}{t.weight&&<span style={{marginLeft:5,fontSize:11,opacity:0.8}}>{t.weight}</span>}
+              </button>
+            ))}
+          </div>
+          <div style={{padding:"10px 14px",background:C[tabs[active].color].bg,border:`0.5px solid ${C[tabs[active].color].border}`,borderRadius:8,marginBottom:12}}>
+            <div style={{fontSize:11,color:C[tabs[active].color].badge,fontWeight:500,textTransform:"uppercase",letterSpacing:0.8}}>
+              {tabs[active].label}{tabs[active].weight&&` — ${tabs[active].weight} of exam`}
+            </div>
+            <div style={{fontSize:16,fontWeight:500,color:C[tabs[active].color].header}}>{tabs[active].sub}</div>
+          </div>
+          {tabs[active].component}
+          <div style={{marginTop:24,fontSize:11,color:"#8a8077",textAlign:"center"}}>
+            Microsoft PL-300 • Skills as of April 2026 • Quick-check answers are collapsible
+          </div>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>

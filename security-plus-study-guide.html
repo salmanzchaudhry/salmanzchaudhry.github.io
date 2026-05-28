@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Security+ SY0-701 Study Guide | Salman Chaudhry</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #f9f9f7; font-family: system-ui, sans-serif; }
+    #root { max-width: 760px; margin: 0 auto; padding: 20px 16px 40px; }
+    .nav-bar { background: rgba(255,252,242,.95); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(64,61,57,.12); padding: .9rem 1.5rem; position: sticky; top: 0; z-index: 50; display: flex; align-items: center; justify-content: space-between; }
+    .nav-bar a { font-family: 'Space Mono', monospace; font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; color: #eb5e28; text-decoration: none; }
+    .nav-bar a:last-child { color: #8a8077; }
+    .nav-bar a:last-child:hover { color: #eb5e28; }
+  </style>
+</head>
+<body>
+  <div class="nav-bar">
+    <a href="index.html">$ salman.exe</a>
+    <a href="index.html">← Back to Portfolio</a>
+  </div>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState } = React;
+
+    const colors = {
+      blue:   { bg:"#E6F1FB", border:"#185FA5", header:"#0C447C", text:"#042C53", badge:"#378ADD", badgeText:"#E6F1FB" },
+      red:    { bg:"#FCEBEB", border:"#A32D2D", header:"#791F1F", text:"#501313", badge:"#E24B4A", badgeText:"#FCEBEB" },
+      green:  { bg:"#EAF3DE", border:"#3B6D11", header:"#27500A", text:"#173404", badge:"#639922", badgeText:"#EAF3DE" },
+      purple: { bg:"#EEEDFE", border:"#534AB7", header:"#3C3489", text:"#26215C", badge:"#7F77DD", badgeText:"#EEEDFE" },
+      amber:  { bg:"#FAEEDA", border:"#854F0B", header:"#633806", text:"#412402", badge:"#BA7517", badgeText:"#FAEEDA" },
+      slate:  { bg:"#F1EFE8", border:"#5F5E5A", header:"#444441", text:"#2C2C2A", badge:"#888780", badgeText:"#F1EFE8" },
+    };
+
+    const Tip = ({children}) => (
+      <div style={{margin:"10px 0",padding:"10px 12px",background:"#FAEEDA",borderLeft:"4px solid #BA7517",borderRadius:"0 6px 6px 0"}}>
+        <span style={{fontWeight:500,color:"#633806",fontSize:13}}>⚡ Exam tip: </span>
+        <span style={{color:"#412402",fontSize:13}}>{children}</span>
+      </div>
+    );
+
+    const Memory = ({children}) => (
+      <div style={{margin:"10px 0",padding:"10px 12px",background:"#EAF3DE",borderLeft:"4px solid #3B6D11",borderRadius:"0 6px 6px 0"}}>
+        <span style={{fontWeight:500,color:"#27500A",fontSize:13}}>🧠 Memory trick: </span>
+        <span style={{color:"#173404",fontSize:13}}>{children}</span>
+      </div>
+    );
+
+    const SH = ({children,color="blue"}) => (
+      <h3 style={{fontSize:14,fontWeight:500,margin:"18px 0 8px",padding:"6px 12px",background:colors[color].bg,borderLeft:`4px solid ${colors[color].border}`,borderRadius:"0 6px 6px 0",color:colors[color].header}}>
+        {children}
+      </h3>
+    );
+
+    const T = ({headers,rows,color="blue"}) => (
+      <div style={{overflowX:"auto",margin:"8px 0"}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:12}}>
+          <thead>
+            <tr>{headers.map((h,i)=><th key={i} style={{background:colors[color].badge,color:colors[color].badgeText,padding:"6px 10px",textAlign:"left",fontWeight:500}}>{h}</th>)}</tr>
+          </thead>
+          <tbody>
+            {rows.map((row,i)=>(
+              <tr key={i} style={{background:i%2===0?"#fff":colors[color].bg}}>
+                {row.map((cell,j)=><td key={j} style={{padding:"5px 10px",borderBottom:"0.5px solid #e5e5e5",color:"#333",verticalAlign:"top"}}>{cell}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+
+    const QCheck = ({qs,as}) => {
+      const [show,setShow] = useState(false);
+      return (
+        <div style={{margin:"16px 0",padding:"14px",background:"#EEEDFE",border:"0.5px solid #534AB7",borderRadius:8}}>
+          <div style={{fontWeight:500,color:"#3C3489",fontSize:13,marginBottom:8}}>📝 Quick-check questions</div>
+          <ol style={{margin:"0 0 10px",paddingLeft:20,color:"#26215C",fontSize:13,lineHeight:1.7}}>
+            {qs.map((q,i)=><li key={i}>{q}</li>)}
+          </ol>
+          <button onClick={()=>setShow(!show)} style={{fontSize:12,color:"#534AB7",background:"transparent",border:"0.5px solid #534AB7",borderRadius:4,padding:"3px 10px",cursor:"pointer"}}>
+            {show?"▲ Hide answers":"▶ Reveal answers"}
+          </button>
+          {show&&(
+            <ol style={{margin:"10px 0 0",paddingLeft:20,color:"#27500A",fontSize:13,lineHeight:1.7,background:"#EAF3DE",padding:"10px 10px 10px 28px",borderRadius:6}}>
+              {as.map((a,i)=><li key={i}>{a}</li>)}
+            </ol>
+          )}
+        </div>
+      );
+    };
+
+    function D1() {
+      return (
+        <div>
+          <SH color="blue">1.1 — Security controls</SH>
+          <p style={{fontSize:13,color:"#444",marginBottom:6}}>Every control has a <strong>category</strong> (who implements it) and a <strong>type</strong> (what it does).</p>
+          <T color="blue" headers={["Category","Who/What","Example"]} rows={[
+            ["Technical","Hardware/software","Firewall, MFA, encryption"],
+            ["Managerial","Policies & planning","Risk assessment, security policy"],
+            ["Operational","People & process","Security training, change management"],
+            ["Physical","Physical environment","Locks, cameras, guards, fences"],
+          ]} />
+          <T color="blue" headers={["Type","Goal","Example"]} rows={[
+            ["Preventive","Stop incident before it happens","Firewall, door lock, MFA"],
+            ["Deterrent","Discourage attackers","Warning signs, visible cameras"],
+            ["Detective","Identify incident in progress or after","IDS, audit logs, CCTV"],
+            ["Corrective","Fix damage after incident","Patching, restoring backups"],
+            ["Compensating","Alternative when primary cannot be used","Manual review when MFA is down"],
+            ["Directive","Guide behavior, not mandatory enforcement","Policies, training, signs"],
+          ]} />
+          <Memory>P-D-D-C-C-D: Preventive, Deterrent, Detective, Corrective, Compensating, Directive</Memory>
+
+          <SH color="blue">1.2 — CIA triad + non-repudiation</SH>
+          <T color="blue" headers={["Pillar","Meaning","Controls"]} rows={[
+            ["Confidentiality","Only authorized parties access data","Encryption, ACLs, MFA"],
+            ["Integrity","Data is accurate and unaltered","Hashing, digital signatures, checksums"],
+            ["Availability","Systems accessible when needed","Redundancy, backups, DDoS protection"],
+            ["Non-repudiation","Prove someone did something; they cannot deny it","Digital signatures, audit logs"],
+          ]} />
+
+          <SH color="blue">1.3 — Cryptography</SH>
+          <T color="blue" headers={["","Symmetric","Asymmetric"]} rows={[
+            ["Keys","One shared key","Public + private key pair"],
+            ["Speed","Fast — bulk data","Slow — key exchange/signatures"],
+            ["Examples","AES, DES, 3DES, RC4","RSA, ECC, Diffie-Hellman"],
+          ]} />
+          <Tip>HTTPS uses asymmetric to exchange a symmetric session key, then symmetric encrypts the actual data. Hybrid = best of both worlds.</Tip>
+          <T color="blue" headers={["Algorithm","Type","Notes"]} rows={[
+            ["AES-256","Symmetric","Current standard; 128/192/256-bit keys"],
+            ["RSA","Asymmetric","2048+ bit keys; key exchange + signatures"],
+            ["ECC","Asymmetric","Smaller keys same strength; great for mobile"],
+            ["Diffie-Hellman","Asymmetric","Key exchange ONLY — no encryption or signing"],
+            ["SHA-256 / SHA-3","Hash","Integrity; SHA-1 deprecated"],
+            ["MD5","Hash","Broken — do not use for security; appears as wrong answer"],
+            ["HMAC","Hash + key","Integrity AND authentication combined"],
+            ["bcrypt / PBKDF2 / scrypt","Key stretching","Hash passwords thousands of times; stops brute force"],
+          ]} />
+
+          <SH color="blue">1.4 — PKI & certificate types</SH>
+          <T color="blue" headers={["Term","Meaning"]} rows={[
+            ["CA (Certificate Authority)","Trusted third party issuing digital certificates"],
+            ["Root CA","Top of trust hierarchy; kept offline for security"],
+            ["Intermediate CA","Sits between root and end-entity certs; signs user certs"],
+            ["CRL","Downloadable list of revoked certs; checked periodically"],
+            ["OCSP","Real-time cert status check; more current than CRL"],
+            ["Certificate pinning","App hardcodes expected cert; blocks MITM even with rogue CA"],
+          ]} />
+          <T color="blue" headers={["Cert type","What it proves"]} rows={[
+            ["DV (Domain Validated)","Domain ownership only — fastest, cheapest"],
+            ["OV (Organization Validated)","Verifies org identity in addition to domain"],
+            ["EV (Extended Validation)","Highest trust; formal verification of org"],
+            ["Wildcard","*.example.com — covers all immediate subdomains"],
+            ["SAN","Single cert covering multiple domains and IPs"],
+            ["Self-signed","Signed by own key; no trusted CA; browser warning"],
+          ]} />
+          <Memory>Sign with private key, verify with public key (digital signatures). Encrypt with public key, decrypt with private key (confidentiality).</Memory>
+
+          <SH color="blue">1.5 — Authentication</SH>
+          <T color="blue" headers={["Factor","Type","Examples"]} rows={[
+            ["Something you know","Knowledge","Password, PIN, security question"],
+            ["Something you have","Possession","Smart card, hardware token, phone OTP"],
+            ["Something you are","Inherence","Fingerprint, retina, face, voice"],
+            ["Somewhere you are","Location","GPS, IP geolocation"],
+            ["Something you do","Behavior","Typing cadence, gait analysis"],
+          ]} />
+          <Tip>MFA = two or more DIFFERENT factor types. Two passwords is not MFA.</Tip>
+          <T color="blue" headers={["Protocol","Purpose","Key detail"]} rows={[
+            ["RADIUS","Network AAA (VPN, WiFi)","UDP; encrypts only password field"],
+            ["TACACS+","Device admin AAA (Cisco)","TCP; encrypts entire payload — more secure"],
+            ["Kerberos","Ticket-based SSO","Uses KDC; default in Active Directory; tickets have TTL"],
+            ["LDAP/LDAPS","Directory queries","Port 389 (636 for TLS); queries Active Directory"],
+            ["SAML","Federated web SSO","XML-based; enterprise federation; authentication"],
+            ["OAuth 2.0","Authorization framework","What you CAN DO — not who you are"],
+            ["OIDC","Authentication on top of OAuth","WHO you are — adds identity to OAuth"],
+            ["PAM","Privileged access control","Vaults credentials, JIT access, session recording"],
+          ]} />
+          <Tip>OAuth = authorization (permission to act). OIDC = authentication (identity). SAML = federated SSO for enterprises. This distinction appears constantly on the exam.</Tip>
+
+          <QCheck
+            qs={[
+              "A firewall blocks unauthorized traffic. What control type and category?",
+              "What is the difference between a CRL and OCSP?",
+              "A user's password has a random value added before hashing. What is that value?",
+              "SAML vs. OAuth — which handles authentication, which handles authorization?",
+              "What hardware chip on the motherboard enables BitLocker?",
+            ]}
+            as={[
+              "Preventive (type), Technical (category).",
+              "CRL is a downloadable list checked periodically. OCSP provides real-time status checks.",
+              "A salt. It prevents rainbow table attacks.",
+              "SAML = authentication and SSO. OAuth = authorization (what you can do).",
+              "TPM (Trusted Platform Module).",
+            ]}
+          />
+        </div>
+      );
+    }
+
+    function D2() {
+      return (
+        <div>
+          <SH color="red">2.1 — Threat actors</SH>
+          <T color="red" headers={["Actor","Motivation","Skill"]} rows={[
+            ["Nation-state / APT","Espionage, sabotage, intelligence","Very high — long-term persistent"],
+            ["Organized crime","Financial gain, ransomware","High"],
+            ["Hacktivist","Ideology, publicity, disruption","Moderate"],
+            ["Insider threat","Revenge, financial, or accidental","Varies — has legitimate access"],
+            ["Script kiddie","Fame, curiosity","Low — uses existing tools"],
+          ]} />
+
+          <SH color="red">2.2 — Social engineering</SH>
+          <T color="red" headers={["Attack","Description"]} rows={[
+            ["Phishing","Mass email impersonating trusted entity"],
+            ["Spear phishing","Targeted phishing at specific individual"],
+            ["Whaling","Spear phishing targeting C-suite executives"],
+            ["Vishing","Voice or phone-based phishing"],
+            ["Smishing","SMS text-based phishing"],
+            ["Pretexting","Fabricated scenario to extract info (fake IT support)"],
+            ["Tailgating / Piggybacking","Following authorized person through secure door"],
+            ["Watering hole","Compromise a site your target frequently visits"],
+            ["BEC","Impersonate executive to authorize fraudulent wire transfer"],
+          ]} />
+          <Memory>Social engineering principles: Authority, Urgency, Scarcity, Familiarity, Intimidation, Consensus. Attackers exploit emotions, not technical flaws.</Memory>
+
+          <SH color="red">2.3 — Malware types</SH>
+          <T color="red" headers={["Type","Key characteristic"]} rows={[
+            ["Virus","Attaches to files; needs human action to spread"],
+            ["Worm","Self-replicates across networks; no human trigger"],
+            ["Trojan","Looks legitimate; hides malicious payload"],
+            ["Ransomware","Encrypts files; demands payment; spreads like worm"],
+            ["Rootkit","Hides deep in OS; grants persistent admin; hardest to detect"],
+            ["Fileless malware","Lives in RAM or registry only; no disk file; evades AV"],
+            ["Logic bomb","Dormant until a trigger event (date, user action)"],
+            ["Keylogger","Records keystrokes to steal credentials"],
+            ["RAT","Remote Access Trojan — gives attacker full remote control"],
+            ["Botnet / C2","Army of compromised machines; C&C server orchestrates"],
+            ["Spyware","Secretly collects data (browsing, keystrokes)"],
+          ]} />
+
+          <SH color="red">2.4 — Network & password attacks</SH>
+          <T color="red" headers={["Attack","Description","Defense"]} rows={[
+            ["Brute force","Try every possible combination","Account lockout, strong passwords"],
+            ["Dictionary attack","Try wordlist of common passwords","Complex passwords, lockout"],
+            ["Credential stuffing","Use leaked username/password pairs on other sites","Unique passwords, MFA"],
+            ["Password spraying","One common password across many accounts — avoids lockout","MFA, anomaly detection"],
+            ["Rainbow table","Precomputed hash lookup table","Salting defeats this entirely"],
+            ["On-path (MITM)","Intercept/modify traffic between two parties","TLS, certificate pinning"],
+            ["Replay attack","Capture and retransmit a valid session","Timestamps, session tokens, nonces"],
+            ["DNS poisoning","Corrupt DNS cache → redirect to malicious site","DNSSEC"],
+            ["ARP poisoning","Associate attacker MAC with legitimate IP on LAN","Dynamic ARP inspection"],
+            ["MAC flooding","Flood switch CAM table → switch behaves like hub","Port security on switch"],
+            ["Evil twin","Rogue AP mimicking legitimate SSID","Certificate-based auth, 802.1X"],
+          ]} />
+
+          <SH color="red">2.5 — Application attacks</SH>
+          <T color="red" headers={["Attack","Description"]} rows={[
+            ["SQL injection","Insert SQL commands into input → query or manipulate DB"],
+            ["XSS (Cross-site scripting)","Inject malicious script into page viewed by others"],
+            ["CSRF","Trick authenticated user's browser into making unauthorized request"],
+            ["Buffer overflow","Send more data than buffer can hold → overwrite memory → code execution"],
+            ["Race condition / TOCTOU","Exploit time gap between check and use of a resource"],
+            ["Directory traversal","Use ../ to escape web root and read arbitrary files"],
+            ["Command injection","Inject OS commands through input fields"],
+          ]} />
+
+          <SH color="red">2.6 — Deception technologies</SH>
+          <T color="red" headers={["Technology","Purpose"]} rows={[
+            ["Honeypot","Fake system designed to attract attackers; records their activity"],
+            ["Honeynet","Network of honeypots; larger-scale decoy environment"],
+            ["Honeytoken","Fake credentials or files placed in real systems; alerts on access"],
+            ["DNS sinkhole","Redirect malicious domain requests to controlled server; blocks C2"],
+          ]} />
+
+          <QCheck
+            qs={[
+              "What attack tries one common password against thousands of accounts to avoid lockout?",
+              "You find a process running in RAM with no disk file. What malware type?",
+              "Difference between phishing and spear phishing?",
+              "An attacker floods a switch's MAC table so all frames are broadcast. What attack?",
+              "What places fake credentials inside real systems to detect attackers?",
+            ]}
+            as={[
+              "Password spraying.",
+              "Fileless malware — lives only in memory.",
+              "Phishing is mass and untargeted. Spear phishing is targeted at a specific person.",
+              "MAC flooding — makes the switch degrade to hub behavior.",
+              "Honeytoken.",
+            ]}
+          />
+        </div>
+      );
+    }
+
+    function D3() {
+      return (
+        <div>
+          <SH color="green">3.1 — Network zones & segmentation</SH>
+          <T color="green" headers={["Zone","Description"]} rows={[
+            ["DMZ / Screened subnet","Buffer zone between internet and internal LAN; hosts public servers"],
+            ["Intranet","Internal-only network"],
+            ["Extranet","Intranet portion accessible to partners and vendors"],
+            ["Air gap","Physically isolated; no internet (SCADA, classified systems)"],
+          ]} />
+          <div style={{fontSize:13,color:"#27500A",padding:"8px 12px",background:"#EAF3DE",borderRadius:6,fontFamily:"monospace",margin:"6px 0"}}>
+            Internet → [Outer FW] → DMZ (web, email servers) → [Inner FW] → Internal LAN → [Core FW] → Data/DB layer
+          </div>
+
+          <SH color="green">3.2 — Firewall & network device types</SH>
+          <T color="green" headers={["Device","Layer","Key capability"]} rows={[
+            ["Packet filter","L3/L4","Stateless; checks IP and port only"],
+            ["Stateful firewall","L3/L4","Tracks connection state; smarter than packet filter"],
+            ["NGFW","L3–L7","Deep packet inspection, app awareness, IPS, TLS inspection"],
+            ["UTM","All layers","All-in-one: FW + IPS + AV + content filter"],
+            ["WAF","L7 (HTTP)","Blocks XSS, SQLi, CSRF for web apps"],
+            ["IDS","Passive","Detects and alerts; does NOT block"],
+            ["IPS","Inline/active","Detects AND blocks; must be inline"],
+            ["NAC","Network entry","Checks device health posture before granting access"],
+            ["Proxy","L7","Intermediary; caches and filters outbound traffic"],
+            ["Reverse proxy","L7","Sits in front of servers; load balances, hides internal IPs"],
+          ]} />
+          <Tip>IDS = passive (alerts only). IPS = active (blocks). If the question asks about blocking, the answer is IPS.</Tip>
+
+          <SH color="green">3.3 — VPN & secure communication</SH>
+          <T color="green" headers={["Protocol / Type","Key detail"]} rows={[
+            ["IPSec AH","Authentication Header — integrity + auth ONLY; NO encryption"],
+            ["IPSec ESP","Encapsulating Security Payload — integrity + auth + encryption"],
+            ["IPSec Transport mode","Encrypts payload only; hosts communicate directly"],
+            ["IPSec Tunnel mode","Encrypts entire packet; used in site-to-site VPN"],
+            ["SSL/TLS VPN","Browser-based; no special client; uses HTTPS port"],
+            ["Split tunnel","Only corporate traffic through VPN; internet goes direct"],
+            ["Full tunnel","All traffic through VPN; more secure, higher latency"],
+            ["SD-WAN","Software-managed WAN; uses internet instead of expensive MPLS"],
+            ["SASE","SD-WAN + cloud-delivered security (CASB, FWaaS, ZTNA) combined"],
+          ]} />
+
+          <SH color="green">3.4 — Wireless security</SH>
+          <T color="green" headers={["Standard","Encryption","Status"]} rows={[
+            ["WEP","RC4","Broken — never use; appears on exam as wrong answer"],
+            ["WPA","TKIP","Deprecated"],
+            ["WPA2","AES-CCMP","Still common; vulnerable to KRACK attack"],
+            ["WPA3","AES-GCMP + SAE","Current standard; SAE replaces PSK handshake"],
+          ]} />
+          <Tip>SAE (Simultaneous Authentication of Equals) in WPA3 prevents offline dictionary attacks against the handshake. Common WPA3 exam question.</Tip>
+          <T color="green" headers={["802.1X Role","Description"]} rows={[
+            ["Supplicant","The client device (laptop, phone) requesting access"],
+            ["Authenticator","The switch or AP forwarding the request"],
+            ["Authentication server","RADIUS server making the access decision"],
+          ]} />
+
+          <SH color="green">3.5 — Cloud architecture</SH>
+          <T color="green" headers={["Model","You manage","Provider manages"]} rows={[
+            ["IaaS","OS, apps, data","Hardware, network, virtualization"],
+            ["PaaS","Apps, data","Everything below the app layer"],
+            ["SaaS","Data only (and config)","Everything else"],
+          ]} />
+          <T color="green" headers={["Cloud tool","Purpose"]} rows={[
+            ["CASB","Visibility and control over cloud app usage; discovers shadow IT"],
+            ["CSPM","Finds misconfigurations in cloud environment (e.g., open S3 buckets)"],
+            ["Serverless / FaaS","Code in ephemeral containers; attack surface shifts to code and APIs"],
+          ]} />
+
+          <SH color="green">3.6 — Data states & backup types</SH>
+          <T color="green" headers={["State","Protection method"]} rows={[
+            ["Data at rest","AES encryption, BitLocker, FileVault, LUKS"],
+            ["Data in transit","TLS, IPSec, VPN"],
+            ["Data in use","Hardest to protect; homomorphic encryption (emerging)"],
+          ]} />
+          <T color="green" headers={["Backup type","Backs up","Restore time"]} rows={[
+            ["Full","Everything every time","Fastest — single backup set"],
+            ["Incremental","Changes since last backup (any type)","Slowest — need full + all incrementals"],
+            ["Differential","Changes since last FULL backup","Medium — need full + latest differential"],
+          ]} />
+          <T color="green" headers={["Site type","Cost","Recovery time"]} rows={[
+            ["Hot site","Highest","Minutes — real-time data"],
+            ["Warm site","Medium","Hours — recent data"],
+            ["Cold site","Lowest","Days/weeks — manual restore"],
+          ]} />
+
+          <QCheck
+            qs={[
+              "What is the difference between IDS and IPS?",
+              "IPSec AH vs. ESP — which one provides encryption?",
+              "Employee connects to corporate VPN but browses the internet directly. What tunnel type?",
+              "WPA3 uses what handshake mechanism to replace PSK?",
+              "Which backup strategy requires the least storage per daily backup?",
+            ]}
+            as={[
+              "IDS is passive — detects and alerts. IPS is inline and active — detects AND blocks.",
+              "ESP provides encryption. AH provides only integrity and authentication — no encryption.",
+              "Split tunnel.",
+              "SAE — Simultaneous Authentication of Equals.",
+              "Incremental backup (but slowest to restore).",
+            ]}
+          />
+        </div>
+      );
+    }
+
+    function D4() {
+      return (
+        <div>
+          <SH color="purple">4.1 — Endpoint hardening & baselines</SH>
+          <T color="purple" headers={["Hardening technique","Description"]} rows={[
+            ["Disable unnecessary services/ports","Reduce attack surface — if not needed, turn it off"],
+            ["Remove default credentials","Change immediately on every device and application"],
+            ["Patch management","Apply patches promptly; automate where possible"],
+            ["Host-based firewall","Windows Defender FW, iptables — first line on endpoint"],
+            ["EDR","Advanced AV + behavioral analysis + incident response capability"],
+            ["Full-disk encryption","BitLocker (Windows), FileVault (macOS), LUKS (Linux)"],
+            ["Secure boot","Prevents unauthorized OS from loading; uses TPM"],
+            ["SCAP","Automates security configuration checking against CIS/STIG baselines"],
+          ]} />
+
+          <SH color="purple">4.2 — Vulnerability management</SH>
+          <div style={{fontSize:13,color:"#444",padding:"8px 12px",background:"#EEEDFE",borderRadius:6,marginBottom:8}}>
+            <strong style={{color:"#3C3489"}}>Process:</strong> Identify assets → Scan → Analyze (CVSS) → Remediate → Verify → Report
+          </div>
+          <T color="purple" headers={["Term","Meaning"]} rows={[
+            ["CVE","Standardized vulnerability identifier (e.g., CVE-2021-44228 = Log4Shell)"],
+            ["CVSS","Scores vulns 0–10: Critical 9+, High 7+, Medium 4+, Low 0.1+"],
+            ["NVD","NIST's repository of CVEs with CVSS scores"],
+            ["Credentialed scan","Scanner logs in — deeper, finds misconfigs; most accurate"],
+            ["Uncredentialed scan","No login — simulates external attacker; may miss internal issues"],
+            ["Agent-based scan","Software on endpoint; continuous; good for traveling laptops"],
+          ]} />
+          <T color="purple" headers={["Remediation","When to use"]} rows={[
+            ["Patch","Fix available — always preferred"],
+            ["Workaround","No patch yet — temporary mitigation"],
+            ["Compensating control","Cannot patch (legacy system) — add detection or isolation instead"],
+            ["Accept risk","Low risk + high cost to fix — must be documented"],
+            ["Transfer risk","Insurance, vendor SLA, contract"],
+          ]} />
+
+          <SH color="purple">4.3 — Application security</SH>
+          <T color="purple" headers={["Testing type","Method","Finds"]} rows={[
+            ["SAST","Analyzes source code without running it (white box)","Issues early in dev; code flaws"],
+            ["DAST","Tests running application (black box)","Runtime issues; simulates attacker"],
+            ["IAST","Agent inside app at runtime (hybrid)","Best of both SAST + DAST"],
+            ["SCA","Checks third-party libraries for known CVEs","Vulnerable dependencies"],
+            ["Fuzzing","Throws random/malformed data at app","Crashes, buffer overflows"],
+          ]} />
+          <div style={{margin:"8px 0",padding:"10px 12px",background:"#EEEDFE",borderRadius:6,fontSize:12}}>
+            <strong style={{color:"#3C3489"}}>OWASP Top 10 (2021):</strong>
+            <ol style={{margin:"4px 0 0",paddingLeft:18,color:"#26215C",lineHeight:1.7}}>
+              {["Broken Access Control","Cryptographic Failures","Injection (SQLi, command)","Insecure Design","Security Misconfiguration","Vulnerable & Outdated Components","Authentication Failures","Software & Data Integrity Failures","Logging & Monitoring Failures","SSRF (Server-Side Request Forgery)"].map((x,i)=><li key={i}>{x}</li>)}
+            </ol>
+          </div>
+
+          <SH color="purple">4.4 — Identity & access management</SH>
+          <T color="purple" headers={["Model","Description","Example"]} rows={[
+            ["DAC","Owner sets permissions","Windows NTFS file permissions"],
+            ["MAC","System enforces security labels and clearances","Military classified systems"],
+            ["RBAC","Permissions assigned to roles, not individuals","Active Directory groups"],
+            ["ABAC","Policies based on attributes (dept, time, location)","Zero trust environments"],
+            ["Rule-based","Rules applied uniformly to all users","Firewall ACLs"],
+          ]} />
+          <T color="purple" headers={["PAM feature","Purpose"]} rows={[
+            ["Credential vaulting","Store admin passwords securely; check-in/out model"],
+            ["Just-in-time access","Grant privilege only when needed, for limited time window"],
+            ["Session recording","Record all admin sessions for audit and forensics"],
+            ["Password rotation","Auto-rotate service account passwords on schedule"],
+          ]} />
+
+          <SH color="purple">4.5 — Monitoring, SIEM & SOAR</SH>
+          <T color="purple" headers={["Tool / Concept","Description"]} rows={[
+            ["SIEM","Aggregates + correlates logs from all sources; alerts on anomalies"],
+            ["SOAR","Automates repetitive response tasks; integrates security tools"],
+            ["Playbook","Automated workflow for specific scenario (e.g., phishing email)"],
+            ["Runbook","Manual step-by-step procedure — human executes it"],
+            ["Anomaly-based detection","Flags deviations from baseline; catches zero-days; high false positives"],
+            ["Signature-based detection","Matches known patterns; low false positives; misses zero-days"],
+            ["NetFlow","Metadata about flows (who/when/how much); not full packet capture"],
+          ]} />
+          <Tip>Playbook = automated. Runbook = manual. This distinction is tested directly.</Tip>
+
+          <SH color="purple">4.6 — Email security</SH>
+          <T color="purple" headers={["Control","Purpose"]} rows={[
+            ["SPF","DNS record listing servers authorized to send for your domain"],
+            ["DKIM","Digitally signs outgoing email; receiver verifies signature"],
+            ["DMARC","Policy telling receivers what to do if SPF/DKIM fail (reject/quarantine/none)"],
+            ["S/MIME","End-to-end email encryption + signing using PKI certificates"],
+          ]} />
+
+          <SH color="purple">4.7 — Incident response (PICERL)</SH>
+          <div style={{display:"flex",flexWrap:"wrap",gap:6,margin:"8px 0"}}>
+            {[["1","Preparation","Build plan, train team, prepare tools"],["2","Identification","Detect & confirm incident; determine scope"],["3","Containment","Limit damage — short-term isolate, long-term fix"],["4","Eradication","Remove threat, malware, attacker access"],["5","Recovery","Restore systems; monitor for recurrence"],["6","Lessons Learned","Post-incident review; update policies"]].map(([n,t,d])=>(
+              <div key={n} style={{flex:"1 1 180px",padding:"8px 10px",background:"#EEEDFE",border:"0.5px solid #534AB7",borderRadius:6}}>
+                <div style={{fontSize:11,color:"#7F77DD",fontWeight:500}}>Phase {n}</div>
+                <div style={{fontSize:13,fontWeight:500,color:"#3C3489"}}>{t}</div>
+                <div style={{fontSize:12,color:"#26215C",marginTop:2}}>{d}</div>
+              </div>
+            ))}
+          </div>
+          <T color="purple" headers={["Forensics concept","Detail"]} rows={[
+            ["Order of volatility","CPU cache → RAM → Swap → Network state → Processes → Disk → Backup"],
+            ["Chain of custody","Document everyone who handles evidence"],
+            ["Write blocker","Hardware device preventing writes to evidence drive"],
+            ["Legal hold","Preserve data relevant to litigation — do not delete"],
+          ]} />
+
+          <QCheck
+            qs={[
+              "What is the difference between SAST and DAST?",
+              "PAM feature that grants elevated rights for a limited time window only?",
+              "SPF, DKIM, DMARC — which one creates a digital signature on the email?",
+              "Playbook vs. runbook — which one is automated?",
+              "In PICERL, what phase comes immediately after eradication?",
+            ]}
+            as={[
+              "SAST analyzes static source code. DAST tests the running application.",
+              "Just-in-time (JIT) access.",
+              "DKIM creates the digital signature.",
+              "Playbook = automated. Runbook = manual.",
+              "Recovery (Phase 5).",
+            ]}
+          />
+        </div>
+      );
+    }
+
+    function D5() {
+      return (
+        <div>
+          <SH color="amber">5.1 — Governance & policy hierarchy</SH>
+          <T color="amber" headers={["Level","Description","Example"]} rows={[
+            ["Policy","High-level mandatory statement of intent",'"All data must be encrypted"'],
+            ["Standard","Specific, measurable requirement supporting policy",'"AES-256 must be used"'],
+            ["Procedure","Step-by-step instructions for implementation",'"How to encrypt a laptop with BitLocker"'],
+            ["Guideline","Recommended best practice — not mandatory",'"Consider using a password manager"'],
+            ["Baseline","Minimum security configuration standard","CIS Level 1 benchmark, STIG"],
+          ]} />
+          <T color="amber" headers={["Framework","Focus"]} rows={[
+            ["NIST CSF","Identify, Protect, Detect, Respond, Recover"],
+            ["ISO 27001","International ISMS; formal certification required"],
+            ["SOC 2","Service orgs audited on security, availability, confidentiality"],
+            ["PCI-DSS","Payment card data protection"],
+            ["HIPAA","US healthcare PHI privacy and security"],
+            ["GDPR","EU resident data privacy; applies globally to EU data"],
+          ]} />
+
+          <SH color="amber">5.2 — Risk management & quantitative math</SH>
+          <T color="amber" headers={["Term","Definition"]} rows={[
+            ["Threat","Potential event that could cause harm"],
+            ["Vulnerability","Weakness a threat can exploit"],
+            ["Risk","Likelihood × Impact of a threat exploiting a vulnerability"],
+            ["Residual risk","Risk remaining after controls are applied"],
+            ["Risk appetite","How much risk the org is willing to accept"],
+            ["Inherent risk","Risk level before any controls are in place"],
+          ]} />
+          <div style={{padding:"10px 14px",background:"#FAEEDA",border:"0.5px solid #BA7517",borderRadius:6,margin:"8px 0",fontSize:13}}>
+            <strong style={{color:"#633806"}}>Risk math — memorize this:</strong>
+            <div style={{fontFamily:"monospace",fontSize:12,marginTop:6,color:"#412402",lineHeight:2}}>
+              SLE = AV × EF<br/>
+              ALE = SLE × ARO<br/>
+              <span style={{color:"#854F0B"}}>AV = Asset Value | EF = Exposure Factor | ARO = Annualized Rate of Occurrence</span>
+            </div>
+            <div style={{marginTop:6,color:"#633806",fontSize:12}}>
+              <strong>Example:</strong> Server = $100,000. Flood destroys 40% (EF=0.4). Flood once per 5 yrs (ARO=0.2).<br/>
+              SLE = $100,000 × 0.4 = $40,000 | ALE = $40,000 × 0.2 = <strong>$8,000/year</strong>
+            </div>
+          </div>
+          <T color="amber" headers={["Risk response","When to use"]} rows={[
+            ["Avoid","Stop the risky activity entirely — eliminate the risk source"],
+            ["Transfer","Shift to third party via insurance, contract, or SLA"],
+            ["Mitigate","Reduce likelihood or impact with controls"],
+            ["Accept","Acknowledge risk; document it; low risk or high cost to fix"],
+          ]} />
+
+          <SH color="amber">5.3 — BC/DR metrics</SH>
+          <T color="amber" headers={["Metric","Meaning","Plain English"]} rows={[
+            ["RTO","Recovery Time Objective","Max acceptable downtime before business impact"],
+            ["RPO","Recovery Point Objective","Max acceptable data loss (how old a backup can be)"],
+            ["MTTR","Mean Time to Repair","Average time to restore a failed system"],
+            ["MTBF","Mean Time Between Failures","Average time between system failures"],
+          ]} />
+          <Memory>RTO = Time to recover (downtime). RPO = Point of last backup (data loss). Lower both numbers = more resilient.</Memory>
+
+          <SH color="amber">5.4 — Third-party risk & agreements</SH>
+          <T color="amber" headers={["Agreement","Purpose"]} rows={[
+            ["SLA","Defines service performance expectations and remedies"],
+            ["MOU","Memorandum of Understanding — non-binding intent to cooperate"],
+            ["MOA","Memorandum of Agreement — formal roles and responsibilities"],
+            ["NDA","Protects confidential information from disclosure"],
+            ["BPA","Business Partnership Agreement — defines relationship terms"],
+            ["SOW","Statement of Work — specific deliverables, timeline, cost"],
+          ]} />
+          <T color="amber" headers={["Audit type","Performed by","Purpose"]} rows={[
+            ["Internal audit","Internal staff","Self-assessment; continuous improvement"],
+            ["External audit","Independent third party","Regulatory compliance; objective view"],
+            ["Pentest — Black box","Ethical hacker, no prior knowledge","Simulate external attacker"],
+            ["Pentest — White box","Ethical hacker, full knowledge","Most thorough; covers everything"],
+            ["Pentest — Gray box","Ethical hacker, partial knowledge","Simulates insider or compromised user"],
+            ["Red team","Adversarial team, full simulation","Includes social engineering, physical"],
+          ]} />
+
+          <SH color="amber">5.5 — Data privacy roles</SH>
+          <T color="amber" headers={["Role","Definition"]} rows={[
+            ["DPO (Data Protection Officer)","Required under GDPR; oversees data privacy compliance"],
+            ["Data controller","Determines purpose of processing (the business)"],
+            ["Data processor","Processes data on behalf of controller (vendor, cloud provider)"],
+            ["Data subject","The individual whose data is being processed"],
+          ]} />
+          <T color="amber" headers={["Data destruction method","Use case"]} rows={[
+            ["Shredding","Physical media destruction"],
+            ["Overwrite / Wipe","Magnetic/SSD; NIST 800-88 Clear/Purge standards"],
+            ["Degaussing","Destroys magnetic media using strong magnetic field"],
+            ["Physical destruction","Highest assurance; drill, melt, shred the hardware"],
+          ]} />
+
+          <QCheck
+            qs={[
+              "What is the difference between RTO and RPO?",
+              "AV = $200,000, EF = 25%, ARO = 2. What is the ALE?",
+              "A vendor contract lets your org inspect their security controls. What clause?",
+              "Policy vs. procedure — what is the key difference?",
+              "What GDPR role processes data on behalf of the business?",
+            ]}
+            as={[
+              "RTO = max acceptable downtime. RPO = max acceptable data loss.",
+              "SLE = $200,000 × 0.25 = $50,000. ALE = $50,000 × 2 = $100,000.",
+              "Right-to-audit clause.",
+              "Policy = high-level mandatory intent. Procedure = step-by-step instructions.",
+              "Data processor.",
+            ]}
+          />
+        </div>
+      );
+    }
+
+    function Ref() {
+      return (
+        <div>
+          <SH color="slate">Common ports</SH>
+          <T color="slate" headers={["Port","Protocol","Service"]} rows={[
+            ["20/21","TCP","FTP (data/control)"],["22","TCP","SSH, SFTP, SCP"],["23","TCP","Telnet (insecure)"],
+            ["25","TCP","SMTP (email sending)"],["53","TCP/UDP","DNS"],["67/68","UDP","DHCP"],
+            ["80","TCP","HTTP"],["110","TCP","POP3"],["143","TCP","IMAP"],["161/162","UDP","SNMP"],
+            ["389","TCP","LDAP"],["443","TCP","HTTPS / TLS"],["445","TCP","SMB"],
+            ["465/587","TCP","SMTPS / SMTP with TLS"],["636","TCP","LDAPS"],
+            ["993","TCP","IMAPS"],["995","TCP","POP3S"],
+            ["1433","TCP","Microsoft SQL Server"],["3306","TCP","MySQL"],["3389","TCP","RDP"],
+            ["5060/5061","UDP/TCP","SIP (VoIP)"],["8080","TCP","HTTP alternate"],
+          ]} />
+
+          <SH color="slate">Cryptography reference</SH>
+          <T color="slate" headers={["Algorithm","Type","Key use"]} rows={[
+            ["AES","Symmetric","Bulk data encryption — current standard"],
+            ["3DES","Symmetric","Legacy encryption — being phased out"],
+            ["RSA","Asymmetric","Key exchange, digital signatures"],
+            ["ECC","Asymmetric","Mobile/IoT — small keys, same strength"],
+            ["Diffie-Hellman","Asymmetric","Key exchange ONLY — no encrypt/sign"],
+            ["SHA-256 / SHA-3","Hash","Integrity verification"],
+            ["MD5","Hash","Broken — only used as wrong answer on exam"],
+            ["HMAC","Hash + key","Integrity AND authentication"],
+            ["bcrypt / PBKDF2 / scrypt","Key stretching","Secure password storage"],
+          ]} />
+
+          <SH color="slate">Regulations cheat sheet</SH>
+          <T color="slate" headers={["Regulation","Sector","Key requirement"]} rows={[
+            ["HIPAA","Healthcare","Protect PHI; breach notification within 60 days"],
+            ["PCI-DSS","Payment cards","Protect cardholder data; 12 core requirements"],
+            ["GDPR","EU personal data","Consent, right to erasure, DPO required, 72-hr breach notice"],
+            ["SOX","Public companies","Financial data integrity; CEO/CFO certify controls"],
+            ["FERPA","Education","Student record privacy"],
+            ["GLBA","Financial services","Protect consumer financial information"],
+            ["FISMA","US Federal agencies","Security for federal information systems; NIST compliance"],
+          ]} />
+
+          <SH color="slate">Exam day strategy</SH>
+          <div style={{display:"flex",flexDirection:"column",gap:8,marginTop:8}}>
+            {[
+              ["⏱️ Time management","90 min / up to 90 questions. Performance-based questions come first — flag and return if stuck. Budget ~1 min per question."],
+              ["🎯 BEST questions","Eliminate clearly wrong answers. Between two plausible options, pick the one addressing root cause with least privilege and most specific control."],
+              ["🔢 Risk math","SLE = AV × EF. ALE = SLE × ARO. Memorize this formula — it shows up directly."],
+              ["🔑 OAuth vs. OIDC","OAuth = authorization (what you can do). OIDC = authentication (who you are). SAML = federated enterprise SSO."],
+              ["🛡️ IDS vs. IPS","If question asks about blocking → IPS. If asking about detection and alerting only → IDS."],
+              ["✅ Score needed","750 / 900 (roughly 83%). Don't rush, but keep moving — flag uncertain questions and return."],
+            ].map(([t,d])=>(
+              <div key={t} style={{padding:"8px 12px",background:"#F1EFE8",border:"0.5px solid #888780",borderRadius:6}}>
+                <div style={{fontSize:13,fontWeight:500,color:"#444441"}}>{t}</div>
+                <div style={{fontSize:12,color:"#5F5E5A",marginTop:2}}>{d}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    function App() {
+      const [active, setActive] = useState(0);
+      const tabs = [
+        { label:"Domain 1", sub:"General Security", color:"blue", weight:"12%", component:<D1/> },
+        { label:"Domain 2", sub:"Threats & Vulns", color:"red", weight:"22%", component:<D2/> },
+        { label:"Domain 3", sub:"Architecture", color:"green", weight:"18%", component:<D3/> },
+        { label:"Domain 4", sub:"Operations", color:"purple", weight:"28%", component:<D4/> },
+        { label:"Domain 5", sub:"Governance", color:"amber", weight:"20%", component:<D5/> },
+        { label:"Reference", sub:"Ports & Crypto", color:"slate", weight:"", component:<Ref/> },
+      ];
+      return (
+        <div style={{fontFamily:"system-ui,sans-serif",maxWidth:720,margin:"0 auto",padding:"16px 0"}}>
+          <div style={{fontSize:12,color:"#8a8077",margin:"0 0 4px",textTransform:"uppercase",letterSpacing:1}}>CompTIA Security+ SY0-701</div>
+          <h1 style={{fontSize:22,fontWeight:500,color:"#252422",margin:"0 0 16px"}}>Complete Study Guide</h1>
+          <div style={{display:"flex",height:8,borderRadius:4,overflow:"hidden",marginBottom:16}}>
+            {[["blue",12],["red",22],["green",18],["purple",28],["amber",20]].map(([c,w])=>(
+              <div key={c} style={{flex:w,background:colors[c].badge}} title={w+"%"} />
+            ))}
+          </div>
+          <div style={{display:"flex",gap:4,flexWrap:"wrap",marginBottom:4}}>
+            {tabs.slice(0,5).map((t,i)=>(
+              <div key={i} style={{display:"flex",alignItems:"center",gap:4,fontSize:11,color:colors[t.color].header}}>
+                <div style={{width:10,height:10,borderRadius:2,background:colors[t.color].badge}} />
+                {t.sub} {t.weight}
+              </div>
+            ))}
+          </div>
+          <div style={{display:"flex",flexWrap:"wrap",gap:4,margin:"12px 0"}}>
+            {tabs.map((t,i)=>(
+              <button key={i} onClick={()=>setActive(i)} style={{
+                padding:"6px 12px",borderRadius:6,cursor:"pointer",fontSize:13,fontWeight:active===i?500:400,
+                background:active===i?colors[t.color].badge:colors[t.color].bg,
+                color:active===i?colors[t.color].badgeText:colors[t.color].header,
+                border:`0.5px solid ${colors[t.color].border}`,
+                transition:"all 0.15s",
+              }}>
+                {t.label}{t.weight&&<span style={{marginLeft:6,fontSize:11,opacity:0.8}}>{t.weight}</span>}
+              </button>
+            ))}
+          </div>
+          <div style={{padding:"10px 14px",background:colors[tabs[active].color].bg,border:`0.5px solid ${colors[tabs[active].color].border}`,borderRadius:8,marginBottom:12}}>
+            <div style={{fontSize:11,color:colors[tabs[active].color].badge,fontWeight:500,textTransform:"uppercase",letterSpacing:0.8}}>
+              {tabs[active].label}{tabs[active].weight&&` — ${tabs[active].weight} of exam`}
+            </div>
+            <div style={{fontSize:16,fontWeight:500,color:colors[tabs[active].color].header}}>{tabs[active].sub}</div>
+          </div>
+          {tabs[active].component}
+          <div style={{marginTop:24,fontSize:11,color:"#8a8077",textAlign:"center"}}>
+            CompTIA Security+ SY0-701 • All five domains • Quick-check answers are collapsible
+          </div>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
