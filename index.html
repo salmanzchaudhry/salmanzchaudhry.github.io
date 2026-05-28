@@ -26,6 +26,35 @@
     ::-webkit-scrollbar-thumb { background:#ccc5b9; border-radius:2px; }
     body::before { content:''; position:fixed; inset:0; z-index:0; pointer-events:none; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E"); opacity:.018; }
 
+    /* ── ANIMATION BASE ─────────────────────────────────────── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity .65s cubic-bezier(.4,0,.2,1), transform .65s cubic-bezier(.4,0,.2,1);
+    }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    /* Hero elements animate in sequence via JS — start hidden */
+    .hero-seq { opacity: 0; transform: translateY(18px); transition: opacity .6s ease, transform .6s ease; }
+    .hero-seq.visible { opacity: 1; transform: none; }
+
+    /* Project cards stagger */
+    .card-reveal {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity .55s cubic-bezier(.4,0,.2,1), transform .55s cubic-bezier(.4,0,.2,1);
+    }
+    .card-reveal.visible { opacity: 1; transform: none; }
+
+    /* Skill chips stagger */
+    .chip-reveal {
+      opacity: 0;
+      transform: translateY(12px) scale(.97);
+      transition: opacity .4s ease, transform .4s ease;
+    }
+    .chip-reveal.visible { opacity: 1; transform: none; }
+    /* ─────────────────────────────────────────────────────── */
+
     /* NAV */
     nav { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:1.2rem 3rem; background:rgba(255,252,242,0.94); backdrop-filter:blur(20px); border-bottom:1px solid rgba(64,61,57,0.12); }
     .nav-logo { font-family:var(--font-mono); font-size:.85rem; color:var(--amber); letter-spacing:.08em; text-decoration:none; }
@@ -64,21 +93,15 @@
     .terminal-body { padding:1.5rem; font-family:var(--font-mono); font-size:.8rem; line-height:2; background:#252422; }
     .t-prompt{color:#eb5e28}.t-cmd{color:#fffcf2}.t-out{color:#8a8077;padding-left:1rem}
     .t-key{color:#ccc5b9}.t-val{color:#eb5e28}
-
-    /* ── TERMINAL BARS (FIXED) ──────────────────────────────── */
-    /* Each row: label (fixed width) | track (fills remaining) | value */
     .t-bar-row { display:flex; align-items:center; gap:.6rem; margin-bottom:.45rem; }
     .t-bar-label { min-width:92px; color:#ccc5b9; font-size:.78rem; white-space:nowrap; }
-    /* The track — takes all remaining space, never shrinks */
     .t-bar { flex:1; height:6px; border-radius:3px; background:rgba(255,252,242,.08); position:relative; overflow:hidden; min-width:60px; }
-    /* The fill — driven by CSS custom property --fill, animated on load */
     .t-bar::after { content:''; position:absolute; top:0; left:0; height:100%; width:var(--fill,0%); background:linear-gradient(90deg,var(--amber-dim),var(--amber)); border-radius:3px; transition:width 1.4s cubic-bezier(.4,0,.2,1); }
     .t-bar-value { color:var(--amber); font-size:.78rem; min-width:34px; text-align:right; white-space:nowrap; }
-    /* ───────────────────────────────────────────────────────── */
-
     .cursor{display:inline-block;width:9px;height:1.1em;background:var(--amber);vertical-align:text-bottom;animation:blink 1.1s step-end infinite}
     @keyframes blink{50%{opacity:0}}
-    .scroll-cue { position:absolute; bottom:2.5rem; left:50%; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; gap:.6rem; text-decoration:none; z-index:2; }
+    .scroll-cue { position:absolute; bottom:2.5rem; left:50%; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; gap:.6rem; text-decoration:none; z-index:2; opacity:0; animation: fadeInCue 1s ease 2.2s forwards; }
+    @keyframes fadeInCue { to { opacity:1; } }
     .scroll-text { font-family:var(--font-mono); font-size:.62rem; letter-spacing:.25em; text-transform:uppercase; color:var(--muted); }
     .scroll-line { width:1px; height:42px; background:linear-gradient(180deg, var(--muted), transparent); position:relative; overflow:hidden; }
     .scroll-line::after { content:''; position:absolute; top:0; left:0; width:100%; height:14px; background:var(--amber); animation:scrolldot 2s cubic-bezier(.7,0,.3,1) infinite; }
@@ -91,11 +114,34 @@
     .stat-num { font-family:var(--font-head); font-size:2.8rem; font-weight:800; color:var(--amber); display:block; line-height:1; }
     .stat-label { font-family:var(--font-mono); font-size:.7rem; letter-spacing:.15em; text-transform:uppercase; color:var(--muted); margin-top:.4rem; display:block; }
 
-    /* CERTS */
-    .cert-strip { background:var(--surface2); border-bottom:1px solid var(--border); padding:1.4rem 3rem; display:flex; justify-content:center; gap:.8rem; flex-wrap:wrap; }
-    .cert-badge { font-family:var(--font-mono); font-size:.72rem; letter-spacing:.04em; padding:.42rem 1rem; border-radius:100px; border:1px solid rgba(64,61,57,.18); color:var(--text); background:#fff; display:flex; align-items:center; gap:.45rem; white-space:nowrap; box-shadow:0 1px 4px rgba(64,61,57,.08); }
-    .cert-badge.gold { border-color:rgba(235,94,40,.35); color:var(--amber); background:rgba(235,94,40,.06); }
-    .cert-badge.teal { border-color:rgba(64,61,57,.2); color:var(--text); background:#fff; }
+    /* CERT SLIDESHOW */
+    .cert-slideshow { position:relative; background:var(--surface2); border-top:1px solid var(--border); border-bottom:1px solid var(--border); padding:2.5rem 3rem; overflow:hidden; }
+    .cs-track { display:flex; will-change:transform; }
+    /* Slide transition: combined translate + fade for premium feel */
+    .cs-track { transition: transform .5s cubic-bezier(.4,0,.2,1); }
+    .cs-slide { min-width:100%; display:flex; align-items:center; gap:3rem; padding:0 2rem; opacity:0; transition: opacity .5s ease; pointer-events:none; }
+    .cs-slide.active { opacity:1; pointer-events:auto; }
+    .cs-img-wrap { flex-shrink:0; width:340px; height:240px; border-radius:10px; overflow:hidden; border:1px solid var(--border); box-shadow:0 4px 20px rgba(64,61,57,.12); background:#fff; display:flex; align-items:center; justify-content:center; }
+    .cs-img-wrap img { width:100%; height:100%; object-fit:cover; display:block; transition:transform .35s ease; }
+    .cs-slide.active:hover .cs-img-wrap img { transform:scale(1.03); }
+    .cs-img-placeholder { background:linear-gradient(135deg,var(--surface) 0%,#e0dbd0 100%); }
+    .cs-placeholder-icon { font-size:3.5rem; opacity:.35; }
+    .cs-info { display:flex; flex-direction:column; gap:.6rem; }
+    .cs-issuer { font-family:var(--font-mono); font-size:.72rem; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
+    .cs-title { font-family:var(--font-head); font-size:1.35rem; font-weight:700; color:var(--text); line-height:1.2; }
+    .cs-badge { font-family:var(--font-mono); font-size:.72rem; letter-spacing:.08em; padding:.35rem .85rem; border-radius:100px; border:1px solid; display:inline-block; width:fit-content; text-decoration:none; }
+    .cs-badge.gold { background:rgba(235,94,40,.08); border-color:rgba(235,94,40,.4); color:var(--amber); }
+    .cs-badge.warm { background:var(--surface); border-color:var(--border); color:var(--text); }
+    .cs-badge.verify { background:rgba(64,61,57,.06); border-color:rgba(64,61,57,.2); color:var(--text); transition:border-color .2s,color .2s; }
+    .cs-badge.verify:hover { border-color:var(--amber); color:var(--amber); }
+    .cs-badge.inprogress { background:#fff; border-color:rgba(64,61,57,.18); color:var(--muted); }
+    .cs-btn { position:absolute; top:50%; transform:translateY(-50%); background:#fff; border:1px solid var(--border); border-radius:50%; width:40px; height:40px; font-size:1rem; cursor:pointer; color:var(--text); box-shadow:0 2px 8px rgba(64,61,57,.1); transition:border-color .2s,color .2s,box-shadow .2s; display:flex; align-items:center; justify-content:center; z-index:2; }
+    .cs-btn:hover { border-color:var(--amber); color:var(--amber); box-shadow:0 4px 14px rgba(235,94,40,.2); }
+    .cs-prev { left:.75rem; }
+    .cs-next { right:.75rem; }
+    .cs-dots { display:flex; justify-content:center; gap:.5rem; margin-top:1.4rem; }
+    .cs-dot { width:7px; height:7px; border-radius:50%; background:var(--border); border:none; cursor:pointer; padding:0; transition:background .2s,transform .2s; }
+    .cs-dot.active { background:var(--amber); transform:scale(1.3); }
 
     /* SECTIONS */
     section { padding:7rem 3rem; max-width:var(--max); margin:0 auto; }
@@ -112,12 +158,12 @@
     .card-thumb-pbi  { background:linear-gradient(135deg,#1a1c20 0%,#0d2137 100%); }
     .card-thumb-proc { background:linear-gradient(135deg,#1a1c20 0%,#13200f 100%); }
     .card-thumb-sql  { background:linear-gradient(135deg,#1a1c20 0%,#1a0f20 100%); }
-    .thumb-icon { font-size:3.5rem; position:absolute; opacity:.14; right:1.5rem; bottom:.5rem; transition:transform .35s cubic-bezier(.4,0,.2,1), opacity .35s ease; }
+    .thumb-icon { font-size:3.5rem; position:absolute; opacity:.14; right:1.5rem; bottom:.5rem; transition:transform .35s cubic-bezier(.4,0,.2,1),opacity .35s ease; }
     .project-card:hover .thumb-icon { transform:scale(1.15) rotate(-6deg); opacity:.22; }
     .thumb-badge { position:absolute; top:1rem; left:1rem; font-family:var(--font-mono); font-size:.68rem; letter-spacing:.12em; text-transform:uppercase; padding:.25rem .65rem; border-radius:4px; }
-    .badge-pbi  { background:rgba(245,166,35,.15); color:var(--amber);    border:1px solid rgba(245,166,35,.3); }
+    .badge-pbi  { background:rgba(245,166,35,.15); color:var(--amber); border:1px solid rgba(245,166,35,.3); }
     .badge-proc { background:rgba(64,61,57,.07); color:#fff; border:1px solid rgba(64,61,57,.2); }
-    .badge-sql  { background:rgba(232,93,74,.12);  color:var(--accent-r); border:1px solid rgba(232,93,74,.25); }
+    .badge-sql  { background:rgba(232,93,74,.12); color:var(--accent-r); border:1px solid rgba(232,93,74,.25); }
     .mini-chart { display:flex; align-items:flex-end; gap:4px; height:70px; padding:0 1.5rem; width:100%; }
     .mini-bar { flex:1; border-radius:3px 3px 0 0; background:linear-gradient(180deg,var(--amber) 0%,var(--amber-dim) 100%); opacity:.65; transition:opacity .2s; }
     .mini-bar.teal { background:linear-gradient(180deg,var(--muted) 0%,var(--subtle) 100%); }
@@ -142,10 +188,9 @@
     /* SKILLS */
     #skills { background:var(--surface2); border-top:1px solid var(--border); border-bottom:1px solid var(--border); max-width:100%; position:relative; overflow:hidden; }
     #skills::after { content:''; position:absolute; bottom:0; right:0; width:40%; height:60%; background:radial-gradient(ellipse at 100% 100%, rgba(235,94,40,0.04) 0%, transparent 70%); pointer-events:none; }
-    #skills > .inner { max-width:var(--max); margin:0 auto; padding:6rem 3rem; }
     .tools-mosaic { display:flex; flex-wrap:wrap; gap:.65rem; }
-    .tool-chip { font-family:var(--font-mono); font-size:.76rem; letter-spacing:.06em; padding:.5rem 1rem; border-radius:100px; background:#fff; border:1px solid rgba(64,61,57,.14); color:var(--text); display:flex; align-items:center; gap:.5rem; transition:border-color .2s,color .2s,background .2s; cursor:default; box-shadow:0 1px 3px rgba(64,61,57,.06); }
-    .tool-chip:hover { border-color:var(--amber); color:var(--amber); background:var(--amber-glow); }
+    .tool-chip { font-family:var(--font-mono); font-size:.76rem; letter-spacing:.06em; padding:.5rem 1rem; border-radius:100px; background:#fff; border:1px solid rgba(64,61,57,.14); color:var(--text); display:flex; align-items:center; gap:.5rem; transition:border-color .2s,color .2s,background .2s,transform .15s; cursor:default; box-shadow:0 1px 3px rgba(64,61,57,.06); }
+    .tool-chip:hover { border-color:var(--amber); color:var(--amber); background:var(--amber-glow); transform:translateY(-2px); }
 
     /* TIMELINE */
     .timeline { position:relative; padding-left:2rem; }
@@ -177,12 +222,6 @@
     .to-top { color:var(--muted); text-decoration:none; transition:color .2s; }
     .to-top:hover { color:var(--amber); }
 
-    /* ANIMATIONS */
-    .fade-up { opacity:1; transform:none; transition:opacity .7s ease,transform .7s ease; }
-    .fade-up.will-animate { opacity:0; transform:translateY(28px); }
-    .fade-up.will-animate.visible { opacity:1; transform:none; }
-    .d1{transition-delay:.05s}.d2{transition-delay:.15s}.d3{transition-delay:.25s}.d4{transition-delay:.35s}
-
     @media(max-width:900px) {
       #hero { grid-template-columns:1fr; padding-top:8rem; }
       .hero-visual { display:none; }
@@ -191,16 +230,17 @@
       .nav-links { display:none; }
       section { padding:5rem 1.5rem; }
       .stats-strip { padding:2rem 1.5rem; gap:3rem; }
-      .cert-strip { padding:1.2rem 1.5rem; }
-      .skills-layout { grid-template-columns:1fr; gap:3rem; }
       .edu-grid { grid-template-columns:1fr; }
       footer { flex-direction:column; gap:.5rem; text-align:center; }
+      .cs-slide { flex-direction:column; gap:1.2rem; padding:0 2.5rem; }
+      .cs-img-wrap { width:100%; height:200px; }
+      .cs-title { font-size:1.05rem; }
+      .cert-slideshow { padding:2rem 1rem; }
     }
   </style>
 </head>
 <body>
 
-<!-- NAV -->
 <nav>
   <a href="#hero" class="nav-logo">$ salman.exe</a>
   <ul class="nav-links">
@@ -214,25 +254,25 @@
 
 <!-- HERO -->
 <div id="hero">
-  <div class="hero-text fade-up">
-    <p class="hero-eyebrow">Data Analyst</p>
-    <h1 class="hero-name">Salman<br><span>Chaudhry</span></h1>
-    <h3 class="hero-sub" style="color:var(--muted)">MS Health Informatics</h3>
-    <p class="hero-tagline">
+  <div class="hero-text">
+    <p class="hero-eyebrow hero-seq">Data Analyst</p>
+    <h1 class="hero-name hero-seq">Salman<br><span>Chaudhry</span></h1>
+    <h3 class="hero-sub hero-seq" style="color:var(--muted)">MS Health Informatics</h3>
+    <p class="hero-tagline hero-seq">
       Six Sigma Green Belt · Google DA Certified<br>
       Three years of healthcare and enterprise experience, with a focus on <strong>SQL, Python, and Power BI</strong> to build analysis that gives people something real to work with.
     </p>
-    <div class="hero-actions">
+    <div class="hero-actions hero-seq">
       <a href="#projects" class="btn-primary">View My Work</a>
       <a href="mailto:schaudhry1219@gmail.com" class="btn-ghost">Get in Touch</a>
     </div>
-    <div class="availability fade-up d3">
+    <div class="availability hero-seq">
       <span class="avail-dot"></span>
       Available for Data Analyst opportunities
     </div>
   </div>
 
-  <div class="hero-visual fade-up d2">
+  <div class="hero-visual hero-seq">
     <div class="terminal">
       <div class="terminal-bar">
         <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
@@ -275,6 +315,7 @@
       </div>
     </div>
   </div>
+
   <a href="#projects" class="scroll-cue" aria-label="Scroll to projects">
     <span class="scroll-text">Scroll</span>
     <span class="scroll-line"></span>
@@ -283,14 +324,24 @@
 
 <!-- STATS -->
 <div class="stats-strip">
-  <div class="stat fade-up d1"><span class="stat-num">3+</span><span class="stat-label">Years of Experience</span></div>
-  <div class="stat fade-up d2"><span class="stat-num" data-target="3">3</span><span class="stat-label">Certifications Earned</span></div>
+  <div class="stat reveal"><span class="stat-num">3+</span><span class="stat-label">Years of Experience</span></div>
+  <div class="stat reveal"><span class="stat-num" data-target="3">0</span><span class="stat-label">Certifications Earned</span></div>
 </div>
 
-<!-- CERTS -->
 <!-- CERT SLIDESHOW -->
-<div class="cert-slideshow fade-up">
+<div class="cert-slideshow reveal">
   <div class="cs-track" id="csTrack">
+
+    <div class="cs-slide active">
+      <div class="cs-img-wrap">
+        <img src="Diploma.jpg" alt="MS Health Informatics Diploma" loading="lazy" />
+      </div>
+      <div class="cs-info">
+        <span class="cs-issuer">Nova Southeastern University</span>
+        <h3 class="cs-title">MS, Health Informatics · GPA 3.8</h3>
+        <a href="https://www.parchment.com/lp/award/ccea2928-5b99-4950-9c8e-f61adf597fcc" target="_blank" class="cs-badge verify">Verify ↗</a>
+      </div>
+    </div>
 
     <div class="cs-slide">
       <div class="cs-img-wrap">
@@ -299,17 +350,6 @@
       <div class="cs-info">
         <span class="cs-issuer">CSSC · Council for Six Sigma Certification</span>
         <h3 class="cs-title">Lean Six Sigma Green Belt</h3>
-        <span class="cs-badge gold">Certified</span>
-      </div>
-    </div>
-
-    <div class="cs-slide">
-      <div class="cs-img-wrap">
-        <img src="Google DA.jpg" alt="Google Data Analytics Professional Certificate" loading="lazy" />
-      </div>
-      <div class="cs-info">
-        <span class="cs-issuer">Google · Coursera</span>
-        <h3 class="cs-title">Data Analytics Professional Certificate</h3>
         <span class="cs-badge gold">Certified</span>
       </div>
     </div>
@@ -327,16 +367,16 @@
 
     <div class="cs-slide">
       <div class="cs-img-wrap">
-        <img src="Diploma.jpg" alt="MS Health Informatics Diploma" loading="lazy" />
+        <img src="Google DA.jpg" alt="Google Data Analytics Professional Certificate" loading="lazy" />
       </div>
       <div class="cs-info">
-        <span class="cs-issuer">Nova Southeastern University</span>
-        <h3 class="cs-title">MS, Health Informatics · GPA 3.8</h3>
-        <a href="https://www.parchment.com/lp/award/ccea2928-5b99-4950-9c8e-f61adf597fcc" target="_blank" class="cs-badge verify">Verify ↗</a>
+        <span class="cs-issuer">Google · Coursera</span>
+        <h3 class="cs-title">Data Analytics Professional Certificate</h3>
+        <span class="cs-badge gold">Certified</span>
       </div>
     </div>
 
-    <div class="cs-slide cs-coming">
+    <div class="cs-slide">
       <div class="cs-img-wrap cs-img-placeholder">
         <span class="cs-placeholder-icon">📊</span>
       </div>
@@ -348,189 +388,22 @@
     </div>
 
   </div>
-
-  <!-- Controls -->
   <button class="cs-btn cs-prev" id="csPrev" aria-label="Previous">&#8592;</button>
   <button class="cs-btn cs-next" id="csNext" aria-label="Next">&#8594;</button>
-
-  <!-- Dots -->
   <div class="cs-dots" id="csDots"></div>
 </div>
 
-<style>
-.cert-slideshow {
-  position: relative;
-  background: var(--surface2);
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-  padding: 2.5rem 3rem;
-  overflow: hidden;
-}
-.cs-track {
-  display: flex;
-  transition: transform .45s cubic-bezier(.4,0,.2,1);
-}
-.cs-slide {
-  min-width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 3rem;
-  padding: 0 2rem;
-}
-.cs-img-wrap {
-  flex-shrink: 0;
-  width: 340px;
-  height: 240px;
-  border-radius: 10px;
-  overflow: hidden;
-  border: 1px solid var(--border);
-  box-shadow: 0 4px 20px rgba(64,61,57,.12);
-  background: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.cs-img-wrap img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  transition: transform .35s ease;
-}
-.cs-slide:hover .cs-img-wrap img { transform: scale(1.03); }
-.cs-img-placeholder {
-  background: linear-gradient(135deg, var(--surface) 0%, #e0dbd0 100%);
-}
-.cs-placeholder-icon { font-size: 3.5rem; opacity: .35; }
-.cs-info {
-  display: flex;
-  flex-direction: column;
-  gap: .6rem;
-}
-.cs-issuer {
-  font-family: var(--font-mono);
-  font-size: .72rem;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-.cs-title {
-  font-family: var(--font-head);
-  font-size: 1.35rem;
-  font-weight: 700;
-  color: var(--text);
-  line-height: 1.2;
-}
-.cs-badge {
-  font-family: var(--font-mono);
-  font-size: .72rem;
-  letter-spacing: .08em;
-  padding: .35rem .85rem;
-  border-radius: 100px;
-  border: 1px solid;
-  display: inline-block;
-  width: fit-content;
-  text-decoration: none;
-}
-.cs-badge.gold { background: rgba(235,94,40,.08); border-color: rgba(235,94,40,.4); color: var(--amber); }
-.cs-badge.warm { background: var(--surface); border-color: var(--border); color: var(--text); }
-.cs-badge.verify { background: rgba(64,61,57,.06); border-color: rgba(64,61,57,.2); color: var(--text); transition: border-color .2s, color .2s; }
-.cs-badge.verify:hover { border-color: var(--amber); color: var(--amber); }
-.cs-badge.inprogress { background: #fff; border-color: rgba(64,61,57,.18); color: var(--muted); }
-.cs-btn {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background: #fff;
-  border: 1px solid var(--border);
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  font-size: 1rem;
-  cursor: pointer;
-  color: var(--text);
-  box-shadow: 0 2px 8px rgba(64,61,57,.1);
-  transition: border-color .2s, color .2s, box-shadow .2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2;
-}
-.cs-btn:hover { border-color: var(--amber); color: var(--amber); box-shadow: 0 4px 14px rgba(235,94,40,.2); }
-.cs-prev { left: .75rem; }
-.cs-next { right: .75rem; }
-.cs-dots {
-  display: flex;
-  justify-content: center;
-  gap: .5rem;
-  margin-top: 1.4rem;
-}
-.cs-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--border);
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  transition: background .2s, transform .2s;
-}
-.cs-dot.active {
-  background: var(--amber);
-  transform: scale(1.3);
-}
-@media(max-width:768px) {
-  .cert-slideshow { padding: 2rem 1rem; }
-  .cs-slide { flex-direction: column; gap: 1.2rem; padding: 0 2.5rem; }
-  .cs-img-wrap { width: 100%; height: 200px; }
-  .cs-title { font-size: 1.05rem; }
-}
-</style>
-
-<script>
-(function(){
-  const track = document.getElementById('csTrack');
-  const slides = track.querySelectorAll('.cs-slide');
-  const dotsWrap = document.getElementById('csDots');
-  let cur = 0;
-
-  slides.forEach((_,i) => {
-    const d = document.createElement('button');
-    d.className = 'cs-dot' + (i===0?' active':'');
-    d.setAttribute('aria-label','Go to slide '+(i+1));
-    d.addEventListener('click', () => go(i));
-    dotsWrap.appendChild(d);
-  });
-
-  function go(n) {
-    cur = (n + slides.length) % slides.length;
-    track.style.transform = `translateX(-${cur * 100}%)`;
-    dotsWrap.querySelectorAll('.cs-dot').forEach((d,i) => d.classList.toggle('active', i===cur));
-  }
-
-  document.getElementById('csPrev').addEventListener('click', () => go(cur - 1));
-  document.getElementById('csNext').addEventListener('click', () => go(cur + 1));
-
-  // Swipe support for mobile
-  let startX = 0;
-  track.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, {passive:true});
-  track.addEventListener('touchend', e => {
-    const diff = startX - e.changedTouches[0].clientX;
-    if (Math.abs(diff) > 40) go(diff > 0 ? cur + 1 : cur - 1);
-  }, {passive:true});
-})();
-</script>
-
 <!-- PROJECTS -->
 <section id="projects">
-  <p class="section-eyebrow fade-up"><span class="eyebrow-num">01</span> Featured Work</p>
-  <h2 class="section-title fade-up d1">Real Projects.<br>Real Impact.</h2>
-  <p class="section-sub fade-up d2">A selection of projects built from real work and personal learning, each tied to specific tools, decisions, and measurable outcomes.</p>
+  <p class="section-eyebrow reveal">
+    <span class="eyebrow-num">01</span> Featured Work
+  </p>
+  <h2 class="section-title reveal">Real Projects.<br>Real Impact.</h2>
+  <p class="section-sub reveal">A selection of projects built from real work and personal learning, each tied to specific tools, decisions, and measurable outcomes.</p>
 
   <div class="projects-grid">
 
-    <!-- GLP-1 Dashboard -->
-    <a href="#" class="project-card fade-up d1">
+    <a href="#" class="project-card card-reveal" style="transition-delay:.05s">
       <div class="card-thumb card-thumb-pbi">
         <span class="thumb-badge badge-pbi">Power BI · In Progress</span>
         <div class="mini-chart">
@@ -553,8 +426,7 @@
       </div>
     </a>
 
-    <!-- SQL Data Warehouse -->
-    <a href="sql-data-warehouse.html" class="project-card fade-up d2">
+    <a href="sql-data-warehouse.html" class="project-card card-reveal" style="transition-delay:.15s">
       <div class="card-thumb card-thumb-sql">
         <span class="thumb-badge badge-sql">Data Engineering</span>
         <div class="mini-flow">
@@ -576,8 +448,7 @@
       </div>
     </a>
 
-    <!-- Orlando Health -->
-    <a href="orlando-health.html" class="project-card fade-up d3">
+    <a href="orlando-health.html" class="project-card card-reveal" style="transition-delay:.25s">
       <div class="card-thumb card-thumb-proc">
         <span class="thumb-badge badge-proc">Healthcare Analytics</span>
         <div class="mini-chart">
@@ -600,8 +471,7 @@
       </div>
     </a>
 
-    <!-- Study Guides -->
-    <div class="project-card fade-up d4" style="cursor:default;">
+    <div class="project-card card-reveal" style="cursor:default;transition-delay:.35s">
       <div class="card-thumb card-thumb-pbi">
         <span class="thumb-badge badge-pbi">Interactive Tools</span>
         <div class="mini-flow">
@@ -631,132 +501,124 @@
 
 <!-- SKILLS -->
 <div id="skills">
-  <div class="inner">
-    <div style="max-width:var(--max);margin:0 auto;padding:6rem 3rem;">
-      <p class="section-eyebrow fade-up"><span class="eyebrow-num">02</span> Capabilities</p>
-      <h2 class="section-title fade-up d1">Full Toolkit</h2>
-      <p style="color:var(--muted);font-size:1rem;margin-bottom:3rem;line-height:1.85;max-width:580px;" class="fade-up d2">I believe the best analysts are not defined by a single tool but by their ability to pick the right one for the problem. Below is the full range of what I work with, organized by how I actually use them.</p>
+  <div style="max-width:var(--max);margin:0 auto;padding:6rem 3rem;">
+    <p class="section-eyebrow reveal"><span class="eyebrow-num">02</span> Capabilities</p>
+    <h2 class="section-title reveal">Full Toolkit</h2>
+    <p style="color:var(--muted);font-size:1rem;margin-bottom:3rem;line-height:1.85;max-width:580px;" class="reveal">I believe the best analysts are not defined by a single tool but by their ability to pick the right one for the problem. Below is the full range of what I work with, organized by how I actually use them.</p>
 
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:2rem;" class="fade-up d3">
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:2rem;">
 
-        <!-- Visualization & Reporting -->
-        <div>
-          <p style="font-family:var(--font-mono);font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--amber);margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid var(--border);">Visualization & Reporting</p>
-          <div class="tools-mosaic">
-            <span class="tool-chip"><span>📊</span> Power BI</span>
-            <span class="tool-chip"><span>📐</span> DAX</span>
-            <span class="tool-chip"><span>🔄</span> Power Query</span>
-            <span class="tool-chip"><span>📋</span> Advanced Excel</span>
-            <span class="tool-chip"><span>📈</span> SAS JMP</span>
-          </div>
+      <div class="reveal">
+        <p style="font-family:var(--font-mono);font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--amber);margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid var(--border);">Visualization & Reporting</p>
+        <div class="tools-mosaic">
+          <span class="tool-chip chip-reveal">📊 Power BI</span>
+          <span class="tool-chip chip-reveal">📐 DAX</span>
+          <span class="tool-chip chip-reveal">🔄 Power Query</span>
+          <span class="tool-chip chip-reveal">📋 Advanced Excel</span>
+          <span class="tool-chip chip-reveal">📈 SAS JMP</span>
         </div>
-
-        <!-- Data & Databases -->
-        <div>
-          <p style="font-family:var(--font-mono);font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--amber);margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid var(--border);">Data & Databases</p>
-          <div class="tools-mosaic">
-            <span class="tool-chip"><span>🗃️</span> SQL (T-SQL, BigQuery)</span>
-            <span class="tool-chip"><span>🗄️</span> Microsoft SQL Server</span>
-            <span class="tool-chip"><span>🐍</span> Python (Pandas, NumPy)</span>
-          </div>
-        </div>
-
-        <!-- Data Engineering -->
-        <div>
-          <p style="font-family:var(--font-mono);font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--amber);margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid var(--border);">Data Engineering</p>
-          <div class="tools-mosaic">
-            <span class="tool-chip"><span>🧱</span> Databricks</span>
-            <span class="tool-chip"><span>⚡</span> PySpark</span>
-            <span class="tool-chip"><span>🔁</span> ETL / ELT</span>
-            <span class="tool-chip"><span>💻</span> Git / GitHub</span>
-            <span class="tool-chip"><span>🔌</span> APIs</span>
-          </div>
-        </div>
-
-        <!-- Analysis & Methods -->
-        <div>
-          <p style="font-family:var(--font-mono);font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--text);margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid rgba(37,36,34,.12);">Analysis & Methods</p>
-          <div class="tools-mosaic">
-            <span class="tool-chip"><span>📌</span> Gap Analysis</span>
-            <span class="tool-chip"><span>📏</span> KPI Design</span>
-            <span class="tool-chip"><span>🗺️</span> Data Modeling</span>
-            <span class="tool-chip"><span>🔍</span> EDA</span>
-          </div>
-        </div>
-
-        <!-- Project & Process -->
-        <div>
-          <p style="font-family:var(--font-mono);font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--text);margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid rgba(37,36,34,.12);">Project & Process</p>
-          <div class="tools-mosaic">
-            <span class="tool-chip"><span>⚙️</span> Lean Six Sigma</span>
-            <span class="tool-chip"><span>🔀</span> Agile / Scrum</span>
-            <span class="tool-chip"><span>📄</span> Requirements Analysis</span>
-            <span class="tool-chip"><span>📦</span> Visio</span>
-            <span class="tool-chip"><span>🎫</span> ServiceNow</span>
-            <span class="tool-chip"><span>🚀</span> Jira</span>
-          </div>
-        </div>
-
-        <!-- Healthcare & Compliance -->
-        <div>
-          <p style="font-family:var(--font-mono);font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--text);margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid rgba(37,36,34,.12);">Healthcare & Compliance</p>
-          <div class="tools-mosaic">
-            <span class="tool-chip"><span>🏥</span> Epic EHR</span>
-            <span class="tool-chip"><span>🔐</span> HIPAA / HITECH</span>
-          </div>
-        </div>
-
       </div>
+
+      <div class="reveal">
+        <p style="font-family:var(--font-mono);font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--amber);margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid var(--border);">Data & Databases</p>
+        <div class="tools-mosaic">
+          <span class="tool-chip chip-reveal">🗃️ SQL (T-SQL, BigQuery)</span>
+          <span class="tool-chip chip-reveal">🗄️ Microsoft SQL Server</span>
+          <span class="tool-chip chip-reveal">🐍 Python (Pandas, NumPy)</span>
+        </div>
+      </div>
+
+      <div class="reveal">
+        <p style="font-family:var(--font-mono);font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--amber);margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid var(--border);">Data Engineering</p>
+        <div class="tools-mosaic">
+          <span class="tool-chip chip-reveal">🧱 Databricks</span>
+          <span class="tool-chip chip-reveal">⚡ PySpark</span>
+          <span class="tool-chip chip-reveal">🔁 ETL / ELT</span>
+          <span class="tool-chip chip-reveal">💻 Git / GitHub</span>
+          <span class="tool-chip chip-reveal">🔌 APIs</span>
+        </div>
+      </div>
+
+      <div class="reveal">
+        <p style="font-family:var(--font-mono);font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--text);margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid rgba(37,36,34,.12);">Analysis & Methods</p>
+        <div class="tools-mosaic">
+          <span class="tool-chip chip-reveal">📌 Gap Analysis</span>
+          <span class="tool-chip chip-reveal">📏 KPI Design</span>
+          <span class="tool-chip chip-reveal">🗺️ Data Modeling</span>
+          <span class="tool-chip chip-reveal">🔍 EDA</span>
+        </div>
+      </div>
+
+      <div class="reveal">
+        <p style="font-family:var(--font-mono);font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--text);margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid rgba(37,36,34,.12);">Project & Process</p>
+        <div class="tools-mosaic">
+          <span class="tool-chip chip-reveal">⚙️ Lean Six Sigma</span>
+          <span class="tool-chip chip-reveal">🔀 Agile / Scrum</span>
+          <span class="tool-chip chip-reveal">📄 Requirements Analysis</span>
+          <span class="tool-chip chip-reveal">📦 Visio</span>
+          <span class="tool-chip chip-reveal">🎫 ServiceNow</span>
+          <span class="tool-chip chip-reveal">🚀 Jira</span>
+        </div>
+      </div>
+
+      <div class="reveal">
+        <p style="font-family:var(--font-mono);font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--text);margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid rgba(37,36,34,.12);">Healthcare & Compliance</p>
+        <div class="tools-mosaic">
+          <span class="tool-chip chip-reveal">🏥 Epic EHR</span>
+          <span class="tool-chip chip-reveal">🔐 HIPAA / HITECH</span>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
 
 <!-- EXPERIENCE -->
 <section id="about">
-  <p class="section-eyebrow fade-up"><span class="eyebrow-num">03</span> Work Experience</p>
-  <h2 class="section-title fade-up d1">The Journey<br>So Far</h2>
-  <p class="section-sub fade-up d2">Across each role, the focus has been the same: take complex information and make it useful to the people who need to act on it, whether that was a clinical team, a member program, or executive leadership.</p>
+  <p class="section-eyebrow reveal"><span class="eyebrow-num">03</span> Work Experience</p>
+  <h2 class="section-title reveal">The Journey<br>So Far</h2>
+  <p class="section-sub reveal">Across each role, the focus has been the same: take complex information and make it useful to the people who need to act on it, whether that was a clinical team, a member program, or executive leadership.</p>
 
-  <div class="timeline fade-up d3">
-    <div class="tl-item">
+  <div class="timeline">
+    <div class="tl-item reveal">
       <div class="tl-dot teal"></div>
       <p class="tl-year teal-yr">Sept 2024, Present · Austin, TX</p>
       <h3 class="tl-title">Business Analyst Associate</h3>
       <p class="tl-company">Teacher Retirement System of Texas</p>
       <p class="tl-body">At TRS, the work has been about closing the gap between raw data and the decisions that depend on it. One of the more meaningful things I worked on was building a Databricks pipeline that connected survey data directly into Power BI, a process that had previously required manual exports and hand-offs that delayed leadership by days. Beyond the pipeline work, I have also been focused on redesigning how workflows move through the organization, bringing cycle times down by 35% on event coordination processes that had grown unnecessarily complicated over time.</p>
     </div>
-    <div class="tl-item">
+    <div class="tl-item reveal">
       <div class="tl-dot"></div>
       <p class="tl-year">May 2024, Aug 2024 · Orlando, FL</p>
       <h3 class="tl-title">Business Development Reporting Analyst Intern</h3>
       <p class="tl-company">Orlando Health</p>
-      <p class="tl-body">The internship at Orlando Health was where I learned what it actually means to do healthcare analytics — not just pulling numbers, but understanding why a clinical process breaks down and what the data is telling you about it. I spent the summer digging into Epic EHR referral and claims data, mapping where patient access was slowing and why. The analysis pointed to real bottlenecks in the authorization process, and the workflow changes that followed contributed to a 30% increase in patient volume and 200 additional authorizations processed each quarter. What stuck with me most was how much the upfront conversations with clinical staff shaped what I even thought to look for in the data.</p>
+      <p class="tl-body">The internship at Orlando Health was where I learned what it actually means to do healthcare analytics. I spent the summer digging into Epic EHR referral and claims data, mapping where patient access was slowing and why. The analysis pointed to real bottlenecks in the authorization process, and the workflow changes that followed contributed to a 30% increase in patient volume and 200 additional authorizations processed each quarter. What stuck with me most was how much the upfront conversations with clinical staff shaped what I even thought to look for in the data.</p>
     </div>
-    <div class="tl-item">
+    <div class="tl-item reveal">
       <div class="tl-dot"></div>
       <p class="tl-year">Jan 2023, Aug 2023 · Remote</p>
       <h3 class="tl-title">Release of Information Specialist</h3>
       <p class="tl-company">Verisma</p>
-      <p class="tl-body">Working in healthcare compliance gave me a different kind of data fluency — one built around precision and accountability rather than dashboards. Every month I was handling 500+ medical record requests, each one requiring the right information to reach the right party without anything going wrong. It was detail-oriented, high-stakes work, and it gave me a strong foundation in how healthcare data actually moves through a system, what HIPAA requires in practice, and how to catch process problems before they compound.</p>
+      <p class="tl-body">Working in healthcare compliance gave me a different kind of data fluency, one built around precision and accountability rather than dashboards. Every month I was handling 500+ medical record requests, each one requiring the right information to reach the right party without anything going wrong. It was detail-oriented, high-stakes work, and it gave me a strong foundation in how healthcare data actually moves through a system, what HIPAA requires in practice, and how to catch process problems before they compound.</p>
     </div>
-    <div class="tl-item">
+    <div class="tl-item reveal">
       <div class="tl-dot"></div>
       <p class="tl-year">June 2022, Feb 2024 · Orlando, FL</p>
       <h3 class="tl-title">Member Information Specialist</h3>
       <p class="tl-company">Exos</p>
-      <p class="tl-body">Exos was where I first built something in Power BI that people actually used to make decisions. I was tracking population health KPIs across member programs and noticed patterns in the engagement data that pointed to churn before it happened. The dashboards I built with DAX and Power Query gave the business real-time visibility into program performance, and the findings fed directly into an incentive redesign that improved program efficacy by 25% and brought member participation up by 15%. It was the first time I understood what it felt like for analysis to land.</p>
+      <p class="tl-body">Exos was where I first built something in Power BI that people actually used to make decisions. I was tracking population health KPIs across member programs and noticed patterns in the engagement data that pointed to churn before it happened. The dashboards I built with DAX and Power Query gave the business real-time visibility into program performance, and the findings fed directly into an incentive redesign that improved program efficacy by 25% and brought member participation up by 15%.</p>
     </div>
   </div>
 
-  <div class="edu-grid fade-up d4">
-    <div class="edu-card">
+  <div class="edu-grid">
+    <div class="edu-card reveal">
       <p class="edu-label" style="color:var(--teal)">GRADUATE</p>
       <p class="edu-school">Nova Southeastern University</p>
       <p class="edu-degree">MS, Health Informatics</p>
       <p class="edu-meta">GPA: 3.8 · Aug 2024 · Davie, FL</p>
       <a href="https://www.parchment.com/lp/award/ccea2928-5b99-4950-9c8e-f61adf597fcc" target="_blank" style="font-family:var(--font-mono);font-size:.72rem;color:var(--teal);text-decoration:none;margin-top:.5rem;display:inline-block;">View Verified Degree ↗</a>
     </div>
-    <div class="edu-card">
+    <div class="edu-card reveal">
       <p class="edu-label" style="color:var(--amber)">UNDERGRADUATE</p>
       <p class="edu-school">University of Central Florida</p>
       <p class="edu-degree">BS, Health Sciences</p>
@@ -767,10 +629,10 @@
 
 <!-- CONTACT -->
 <section id="contact">
-  <p class="section-eyebrow fade-up"><span class="eyebrow-num">04</span> Let's Connect</p>
-  <h2 class="section-title fade-up d1">Open to<br>Opportunities</h2>
-  <p class="section-sub fade-up d2">Actively seeking Data Analyst roles in healthcare or enterprise environments where analytical skills and domain knowledge can contribute to better decisions.</p>
-  <div class="contact-links fade-up d3">
+  <p class="section-eyebrow reveal"><span class="eyebrow-num">04</span> Let's Connect</p>
+  <h2 class="section-title reveal">Open to<br>Opportunities</h2>
+  <p class="section-sub reveal">Actively seeking Data Analyst roles in healthcare or enterprise environments where analytical skills and domain knowledge can contribute to better decisions.</p>
+  <div class="contact-links reveal">
     <a href="mailto:schaudhry1219@gmail.com" class="btn-primary">📧 schaudhry1219@gmail.com</a>
     <a href="https://linkedin.com/in/salmanzchaudhry" target="_blank" class="btn-ghost">💼 LinkedIn</a>
     <a href="Salman_Chaudhry_Resume_DA.pdf" target="_blank" class="btn-ghost">📄 Download Resume</a>
@@ -783,47 +645,106 @@
 </footer>
 
 <script>
-  document.querySelectorAll('.fade-up').forEach(el => el.classList.add('will-animate'));
+// ── 1. HERO SEQUENCE ────────────────────────────────────────
+// Each element fades in one after another on page load
+const heroEls = document.querySelectorAll('.hero-seq');
+heroEls.forEach((el, i) => {
+  setTimeout(() => el.classList.add('visible'), 200 + i * 160);
+});
 
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(el => {
-      if (el.isIntersecting) {
-        el.target.classList.add('visible');
-        el.target.querySelectorAll('[data-target]').forEach(s => {
-          const target = +s.dataset.target;
-          let cur = 0;
-          const step = Math.max(1, Math.ceil(target / 40));
-          const tick = () => { cur = Math.min(cur + step, target); s.textContent = cur; if (cur < target) requestAnimationFrame(tick); };
-          tick();
-        });
-      }
-    });
-  }, { threshold: 0.12 });
-
-  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
-
-  // ── TERMINAL BARS ─────────────────────────────────────────
-  // Uses CSS custom property --fill on each .t-bar element.
-  // The ::after pseudo-element reads --fill and animates its width.
-  // This avoids flex-shrink collapsing the bars entirely.
-  setTimeout(() => {
-    [['bar1','88%'],['bar2','75%'],['bar3','82%'],['bar4','70%']].forEach(([id, w], i) => {
-      setTimeout(() => {
-        const el = document.getElementById(id);
-        if (el) el.style.setProperty('--fill', w);
-      }, 600 + i * 220);
-    });
-    document.querySelectorAll('#hero .fade-up').forEach((el, i) => {
-      setTimeout(() => el.classList.add('visible'), 100 + i * 150);
-    });
-  }, 300);
-  // ─────────────────────────────────────────────────────────
-
-  window.addEventListener('scroll', () => {
-    let cur = '';
-    document.querySelectorAll('section[id],div[id]').forEach(s => { if (window.scrollY >= s.offsetTop - 200) cur = s.id; });
-    document.querySelectorAll('.nav-links a').forEach(a => { a.style.color = a.getAttribute('href') === '#'+cur ? 'var(--amber)' : ''; });
+// Terminal bars fire after hero text settles
+setTimeout(() => {
+  [['bar1','88%'],['bar2','75%'],['bar3','82%'],['bar4','70%']].forEach(([id, w], i) => {
+    setTimeout(() => {
+      const el = document.getElementById(id);
+      if (el) el.style.setProperty('--fill', w);
+    }, i * 220);
   });
+}, 900);
+
+// ── 2. SCROLL REVEAL ────────────────────────────────────────
+// Handles .reveal, .card-reveal, and .chip-reveal
+const revealObs = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (!entry.isIntersecting) return;
+    const el = entry.target;
+
+    // Stat counter
+    if (el.querySelector('[data-target]')) {
+      el.querySelectorAll('[data-target]').forEach(s => {
+        const target = +s.dataset.target;
+        let cur = 0;
+        const step = Math.max(1, Math.ceil(target / 40));
+        const tick = () => { cur = Math.min(cur + step, target); s.textContent = cur; if (cur < target) requestAnimationFrame(tick); };
+        setTimeout(tick, 200);
+      });
+    }
+
+    el.classList.add('visible');
+    revealObs.unobserve(el);
+  });
+}, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.reveal, .card-reveal').forEach(el => revealObs.observe(el));
+
+// Skill chips stagger within each section as it enters view
+const chipObs = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (!entry.isIntersecting) return;
+    entry.target.querySelectorAll('.chip-reveal').forEach((chip, i) => {
+      setTimeout(() => chip.classList.add('visible'), i * 60);
+    });
+    chipObs.unobserve(entry.target);
+  });
+}, { threshold: 0.15 });
+
+document.querySelectorAll('#skills .reveal').forEach(el => chipObs.observe(el));
+
+// ── 3. CERT SLIDESHOW ───────────────────────────────────────
+(function(){
+  const track = document.getElementById('csTrack');
+  const slides = track.querySelectorAll('.cs-slide');
+  const dotsWrap = document.getElementById('csDots');
+  let cur = 0;
+
+  slides.forEach((_, i) => {
+    const d = document.createElement('button');
+    d.className = 'cs-dot' + (i === 0 ? ' active' : '');
+    d.setAttribute('aria-label', 'Go to slide ' + (i + 1));
+    d.addEventListener('click', () => go(i));
+    dotsWrap.appendChild(d);
+  });
+
+  function go(n) {
+    slides[cur].classList.remove('active');
+    cur = (n + slides.length) % slides.length;
+    track.style.transform = `translateX(-${cur * 100}%)`;
+    slides[cur].classList.add('active');
+    dotsWrap.querySelectorAll('.cs-dot').forEach((d, i) => d.classList.toggle('active', i === cur));
+  }
+
+  document.getElementById('csPrev').addEventListener('click', () => go(cur - 1));
+  document.getElementById('csNext').addEventListener('click', () => go(cur + 1));
+
+  // Swipe
+  let startX = 0;
+  track.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive: true });
+  track.addEventListener('touchend', e => {
+    const diff = startX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 40) go(diff > 0 ? cur + 1 : cur - 1);
+  }, { passive: true });
+})();
+
+// ── 4. NAV ACTIVE STATE ─────────────────────────────────────
+window.addEventListener('scroll', () => {
+  let cur = '';
+  document.querySelectorAll('section[id], div[id]').forEach(s => {
+    if (window.scrollY >= s.offsetTop - 200) cur = s.id;
+  });
+  document.querySelectorAll('.nav-links a').forEach(a => {
+    a.style.color = a.getAttribute('href') === '#' + cur ? 'var(--amber)' : '';
+  });
+});
 </script>
 </body>
 </html>
