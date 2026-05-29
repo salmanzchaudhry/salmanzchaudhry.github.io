@@ -105,9 +105,9 @@
     .cs-card:hover { transform:translateY(-3px); box-shadow:0 10px 28px rgba(64,61,57,.12); }
     .cs-card-img { width:100%; height:175px; object-fit:cover; display:block; }
     .cs-card-placeholder { width:100%; height:175px; background:linear-gradient(135deg,var(--surface) 0%,#e0dbd0 100%); display:flex; align-items:center; justify-content:center; font-size:2.8rem; opacity:.45; }
-    .cs-card-body { padding:.9rem 1rem 1rem; }
+    .cs-card-body { padding:.9rem 1rem 1rem; display:flex; flex-direction:column; justify-content:space-between; min-height:90px; }
     .cs-card-issuer { font-family:var(--font-mono); font-size:.63rem; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-bottom:.3rem; }
-    .cs-card-title { font-family:var(--font-head); font-size:.9rem; font-weight:700; color:var(--text); line-height:1.25; margin-bottom:.5rem; }
+    .cs-card-title { font-family:var(--font-head); font-size:.9rem; font-weight:700; color:var(--text); line-height:1.25; margin-bottom:.5rem; flex:1; }
     .cs-badge { font-family:var(--font-mono); font-size:.68rem; letter-spacing:.06em; padding:.28rem .75rem; border-radius:100px; border:1px solid; display:inline-block; width:fit-content; text-decoration:none; }
     .cs-badge.gold { background:rgba(235,94,40,.08); border-color:rgba(235,94,40,.4); color:var(--amber); }
     .cs-badge.warm { background:var(--surface); border-color:var(--border); color:var(--text); }
@@ -226,7 +226,7 @@
     <h3 class="hero-sub hero-seq" style="color:var(--muted)">MS Health Informatics</h3>
     <p class="hero-tagline hero-seq">
       Six Sigma Green Belt · Google DA Certified<br>
-      Three years of healthcare and enterprise experience, with a focus on <strong>SQL, Python, and Power BI</strong> to build analysis that gives people something real to work with.
+      Three years of healthcare and enterprise experience, with a focus on <strong>SQL, Python, and Power BI</strong> to turn data into the kind of clarity that makes better decisions possible.
     </p>
     <div class="hero-actions hero-seq">
       <a href="#projects" class="btn-primary">View My Work</a>
@@ -341,7 +341,7 @@
     <!-- GLP-1 -->
     <a href="glp1-dashboard.html" class="project-card card-reveal" style="transition-delay:.05s">
       <div class="card-thumb card-thumb-pbi">
-        <span class="thumb-badge badge-pbi">Power BI · In Progress</span>
+        <span class="thumb-badge badge-pbi">Power BI</span>
         <div class="mini-chart">
           <div class="mini-bar teal" style="height:40%"></div>
           <div class="mini-bar" style="height:55%"></div>
@@ -358,37 +358,14 @@
         <h3 class="card-title">GLP-1 Medicare Spending Dashboard</h3>
         <p class="card-desc">3-page Power BI dashboard analyzing GLP-1 drug spending growth in Medicare (2019–2027) using real CMS data. Covers historical trends, FDA policy timeline, and BALANCE Model cost projections with what-if parameters and DAX scenario modeling.</p>
         <div class="card-tags"><span class="tag">Power BI</span><span class="tag">DAX</span><span class="tag">CMS Data</span><span class="tag">Power Query</span><span class="tag">Time Intelligence</span><span class="tag">BALANCE Model</span></div>
-        <span class="card-link" style="color:var(--muted)">In Progress →</span>
-      </div>
-    </a>
-
-    <!-- SQL Data Warehouse -->
-    <a href="sql-data-warehouse.html" class="project-card card-reveal" style="transition-delay:.15s">
-      <div class="card-thumb card-thumb-sql">
-        <span class="thumb-badge badge-sql">Data Engineering · In Progress</span>
-        <div class="mini-flow">
-          <div class="flow-node" style="background:rgba(205,127,50,.18);border:1px solid rgba(205,127,50,.4)">🥉</div>
-          <div class="flow-arrow"></div>
-          <div class="flow-node" style="background:rgba(168,169,173,.14);border:1px solid rgba(168,169,173,.3)">🥈</div>
-          <div class="flow-arrow"></div>
-          <div class="flow-node" style="background:rgba(255,215,0,.14);border:1px solid rgba(255,215,0,.3)">🥇</div>
-        </div>
-        <span class="impact-pill">6 Scripts · Star Schema · Medallion</span>
-        <span class="thumb-icon">🏗️</span>
-      </div>
-      <div class="card-body">
-        <p class="card-company">Personal Project · Medallion Architecture</p>
-        <h3 class="card-title">SQL Data Warehouse: Bronze, Silver, and Gold</h3>
-        <p class="card-desc">End-to-end Data Warehouse in SQL Server using Medallion Architecture. Built ETL stored procedures, applied 10+ data cleansing transformations, designed a Star Schema with surrogate keys, and documented a full data catalog and naming conventions.</p>
-        <div class="card-tags"><span class="tag">SQL Server</span><span class="tag">T-SQL</span><span class="tag">ETL</span><span class="tag">Star Schema</span><span class="tag">Stored Procs</span><span class="tag">Git</span></div>
-        <span class="card-link" style="color:var(--muted)">In Progress →</span>
+        <span class="card-link">View Project →</span>
       </div>
     </a>
 
     <!-- Orlando Health -->
-    <a href="orlando-health.html" class="project-card card-reveal" style="transition-delay:.25s">
+    <a href="orlando-health.html" class="project-card card-reveal" style="transition-delay:.15s">
       <div class="card-thumb card-thumb-proc">
-        <span class="thumb-badge badge-proc">Healthcare Analytics · In Progress</span>
+        <span class="thumb-badge badge-proc">Healthcare Analytics</span>
         <div class="mini-chart">
           <div class="mini-bar" style="height:35%;background:linear-gradient(180deg,#e85d4a,#9b3a2a)"></div>
           <div class="mini-bar" style="height:50%;background:linear-gradient(180deg,#e85d4a,#9b3a2a)"></div>
@@ -405,14 +382,14 @@
         <h3 class="card-title">Epic EHR Referral Analytics & Workflow Optimization</h3>
         <p class="card-desc">Analyzed Epic EHR claims and referral data to identify patient access bottlenecks. Conducted pre/post KPI gap analysis contributing to 30% patient volume increase and 200 additional quarterly authorizations. Applied Lean Six Sigma to eliminate workflow inefficiencies, saving 60 labor hours monthly.</p>
         <div class="card-tags"><span class="tag">Epic EHR</span><span class="tag">Gap Analysis</span><span class="tag">KPI Analysis</span><span class="tag">Lean Six Sigma</span><span class="tag">SQL</span><span class="tag">DMAIC</span></div>
-        <span class="card-link" style="color:var(--muted)">In Progress →</span>
+        <span class="card-link">View Project →</span>
       </div>
     </a>
 
     <!-- Study Guides -->
-    <div class="project-card card-reveal" style="cursor:default;transition-delay:.35s">
+    <div class="project-card card-reveal" style="cursor:default;transition-delay:.25s">
       <div class="card-thumb card-thumb-pbi">
-        <span class="thumb-badge badge-pbi">Interactive Tools · In Progress</span>
+        <span class="thumb-badge badge-pbi">Interactive Tools</span>
         <div class="mini-flow">
           <div class="flow-node amber">📊</div>
           <div class="flow-arrow"></div>
@@ -434,6 +411,29 @@
         </div>
       </div>
     </div>
+
+    <!-- SQL Data Warehouse -->
+    <a href="sql-data-warehouse.html" class="project-card card-reveal" style="transition-delay:.35s">
+      <div class="card-thumb card-thumb-sql">
+        <span class="thumb-badge badge-sql">Data Engineering · In Progress</span>
+        <div class="mini-flow">
+          <div class="flow-node" style="background:rgba(205,127,50,.18);border:1px solid rgba(205,127,50,.4)">🥉</div>
+          <div class="flow-arrow"></div>
+          <div class="flow-node" style="background:rgba(168,169,173,.14);border:1px solid rgba(168,169,173,.3)">🥈</div>
+          <div class="flow-arrow"></div>
+          <div class="flow-node" style="background:rgba(255,215,0,.14);border:1px solid rgba(255,215,0,.3)">🥇</div>
+        </div>
+        <span class="impact-pill">6 Scripts · Star Schema · Medallion</span>
+        <span class="thumb-icon">🏗️</span>
+      </div>
+      <div class="card-body">
+        <p class="card-company">Personal Project · Medallion Architecture</p>
+        <h3 class="card-title">SQL Data Warehouse: Bronze, Silver, and Gold</h3>
+        <p class="card-desc">End-to-end Data Warehouse in SQL Server using Medallion Architecture. Built ETL stored procedures, applied 10+ data cleansing transformations, designed a Star Schema with surrogate keys, and documented a full data catalog and naming conventions.</p>
+        <div class="card-tags"><span class="tag">SQL Server</span><span class="tag">T-SQL</span><span class="tag">ETL</span><span class="tag">Star Schema</span><span class="tag">Stored Procs</span><span class="tag">Git</span></div>
+        <span class="card-link" style="color:var(--muted)">In Progress →</span>
+      </div>
+    </a>
 
   </div>
 </section>
