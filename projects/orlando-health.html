@@ -146,13 +146,13 @@
 <body>
 
 <nav>
-  <a href="index.html" class="nav-logo">$ salman.exe</a>
-  <a href="index.html" class="nav-back">← Back to Portfolio</a>
+  <a href="../index.html" class="nav-logo">$ salman.exe</a>
+  <a href="../index.html" class="nav-back">← Back to Portfolio</a>
 </nav>
 
 <!-- HERO -->
 <div class="hero">
-  <a href="index.html" class="back-link">← Back to all projects</a>
+  <a href="../index.html" class="back-link">← Back to all projects</a>
   <p class="eyebrow">Healthcare Analytics · Internship Project</p>
   <h1>Epic EHR Referral<br><span>Analytics</span></h1>
   <p class="lead">During my internship at Orlando Health, I spent the summer working inside the referral and authorization process, trying to understand where patient access was breaking down and why. The short version: it was slower than it needed to be, and nobody had pulled the data together to show exactly where the time was going. The work that followed contributed to a 30% increase in patient volume, 200 additional authorizations per quarter, a 15% cost reduction, and 60 labor hours recovered every month.</p>
@@ -216,15 +216,15 @@
   <div class="dashboard-embed">
     <div class="dashboard-toolbar">
       <span class="tdot tdot-r"></span><span class="tdot tdot-y"></span><span class="tdot tdot-g"></span>
-      <span class="ttitle">WQ_Dashboard.html — Orlando Health</span>
+      <span class="ttitle">wq_dashboard.html — Orlando Health</span>
     </div>
     <div class="dashboard-iframe-wrap" id="dashWrap">
-      <iframe id="dashFrame" src="WQ_Dashboard.html" title="Orlando Health WQ Dashboard" loading="lazy" onload="dashLoaded()" onerror="dashFailed()"></iframe>
+      <iframe id="dashFrame" src="wq_dashboard.html" title="Orlando Health WQ Dashboard" loading="lazy" onload="dashLoaded()" onerror="dashFailed()"></iframe>
     </div>
   </div>
 
   <div class="dashboard-actions">
-    <a href="WQ_Dashboard.html" target="_blank" class="db-btn db-btn-primary">↗ Open Full Dashboard</a>
+    <a href="wq_dashboard.html" target="_blank" class="db-btn db-btn-primary">↗ Open Full Dashboard</a>
 
   </div>
 
@@ -368,12 +368,12 @@
 </div>
 
 <footer>
-  <span>© 2025 Salman Chaudhry · <a href="index.html">Back to Portfolio</a></span>
+  <span>© 2025 Salman Chaudhry · <a href="../index.html">Back to Portfolio</a></span>
   <span>Orlando Health · Healthcare Analytics · Lean Six Sigma</span>
 </footer>
 
 <script>
-  // Graceful fallback if WQ_Dashboard.html isn't uploaded yet.
+  // Graceful fallback if wq_dashboard.html isn't uploaded yet.
   // Checks if iframe loads a real document; if it fails (404 or empty), swap in a friendly placeholder.
   function dashLoaded() {
     try {
@@ -392,7 +392,7 @@
     wrap.innerHTML = `
       <div class="dashboard-fallback">
         <h3>Dashboard file not detected</h3>
-        <p>Upload <code>WQ_Dashboard.html</code> to the same folder as this page in your GitHub repository, then refresh to see the live interactive dashboard.</p>
+        <p>Upload <code>wq_dashboard.html</code> to the same folder as this page in your GitHub repository, then refresh to see the live interactive dashboard.</p>
       </div>`;
   }
 </script>
