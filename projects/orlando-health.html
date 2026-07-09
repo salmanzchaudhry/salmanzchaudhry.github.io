@@ -155,7 +155,7 @@
   <a href="../index.html" class="back-link">← Back to all projects</a>
   <p class="eyebrow">Healthcare Analytics · Internship Project</p>
   <h1>Epic EHR Referral<br><span>Analytics</span></h1>
-  <p class="lead">During my internship at Orlando Health, I spent the summer working inside the referral and authorization process, trying to understand where patient access was breaking down and why. The short version: it was slower than it needed to be, and nobody had pulled the data together to show exactly where the time was going. The work that followed contributed to a 30% increase in patient volume, 200 additional authorizations per quarter, a 15% cost reduction, and 60 labor hours recovered every month.</p>
+  <p class="lead">During my internship at Orlando Health, I spent the summer inside the radiology referral and authorization process, trying to understand why so many imaging claims were going unpaid. I analyzed 94,500 Epic EHR billing records in SQL, engineered scheduling accuracy flags, and traced denial root causes back to scheduling inaccuracies, uncovering a $64,000 monthly revenue gap. Modeling the before-and-after impact of the Work Queue system rollout showed payment rates improved 1.3 percentage points, generating an estimated 251 additional paid claims per month, roughly $766K in annualized revenue.</p>
 
   <div class="meta-row">
     <div class="meta-item"><p class="label">Organization</p><p class="value amber">Orlando Health</p></div>
@@ -179,28 +179,28 @@
   <p class="section-label">Measured Impact</p>
   <div class="impact-grid">
     <div class="impact-card">
-      <span class="impact-num">30%</span>
-      <span class="impact-label">Increase in Patient Volume</span>
+      <span class="impact-num">94.5K</span>
+      <span class="impact-label">Epic Billing Records Analyzed</span>
     </div>
     <div class="impact-card">
-      <span class="impact-num">200</span>
-      <span class="impact-label">Additional Authorizations / Quarter</span>
+      <span class="impact-num">$64K</span>
+      <span class="impact-label">Monthly Revenue Gap Identified</span>
     </div>
     <div class="impact-card">
-      <span class="impact-num dark">15%</span>
-      <span class="impact-label">Cost Reduction Achieved</span>
+      <span class="impact-num">251</span>
+      <span class="impact-label">Additional Paid Claims / Month</span>
     </div>
     <div class="impact-card">
-      <span class="impact-num dark">60</span>
-      <span class="impact-label">Labor Hours Saved / Month</span>
+      <span class="impact-num dark">+1.3pp</span>
+      <span class="impact-label">Payment Rate Improvement</span>
     </div>
     <div class="impact-card">
-      <span class="impact-num">3</span>
-      <span class="impact-label">Months to Full Impact</span>
+      <span class="impact-num dark">+$16.96</span>
+      <span class="impact-label">Avg Reimbursement / Case</span>
     </div>
     <div class="impact-card">
-      <span class="impact-num dark">2</span>
-      <span class="impact-label">Clinical Workflows Redesigned</span>
+      <span class="impact-num">$766K</span>
+      <span class="impact-label">Annualized Revenue Lift</span>
     </div>
   </div>
 </div>
@@ -238,29 +238,29 @@
 <!-- THE PROBLEM -->
 <div class="section">
   <p class="section-label">The Problem</p>
-  <h2 class="sh">Where Patient Access Was Breaking Down</h2>
-  <p class="body">When I started pulling the Epic EHR data, the picture that came back was a referral process that had grown into something nobody had fully mapped. Steps were duplicated. Authorizations were being tracked inconsistently across teams. Clinical staff were spending real time on follow-up work that should have been automated or eliminated entirely. Nobody was measuring it, so nobody knew how much it was actually costing in time and patient volume.</p>
-  <p class="body">The goal was to get specific. Not just "the process is slow" but where exactly, by how much, and which changes would actually move the numbers.</p>
+  <h2 class="sh">Where Revenue Was Leaking Out</h2>
+  <p class="body">When I started pulling the Epic EHR billing data, the picture that came back was a scheduling process quietly leaking revenue. Imaging orders scheduled outside their insurance authorization windows were getting denied, and nobody had connected the denials back to the scheduling behavior causing them. The manual DAR scheduling system left too much room for inaccuracy, and no one was measuring what it was costing in unpaid claims.</p>
+  <p class="body">The goal was to get specific. Not just "claims are being denied" but which ones, why, and what fixing the root cause would actually be worth in paid claims and revenue.</p>
 
   <div class="before-after">
     <div class="ba-card before">
-      <span class="ba-label">Before — State of the Process</span>
+      <span class="ba-label">Before — Manual DAR Scheduling</span>
       <ul>
-        <li>Referral tracking was fragmented across multiple Epic workflows</li>
-        <li>No standardized pre/post authorization measurement in place</li>
-        <li>Non-value-added manual steps delayed specialist access by days</li>
-        <li>No visibility into authorization conversion rates by referral type</li>
-        <li>Clinical staff spending excessive time on manual follow-up</li>
+        <li>73.6% insurance payment rate across 36,589 imaging orders</li>
+        <li>No enforcement of insurance authorization windows at scheduling</li>
+        <li>Claim denials untracked and unlinked to scheduling behavior</li>
+        <li>Average paid claim of $238 with revenue lost to preventable denials</li>
+        <li>No visibility into payment performance by location or priority</li>
       </ul>
     </div>
     <div class="ba-card after">
-      <span class="ba-label">After — Post-Implementation</span>
+      <span class="ba-label">After — Work Queue Enforcement (Mar 1 Go-Live)</span>
       <ul>
-        <li>Referral workflow standardized with defined Epic tracking steps</li>
-        <li>KPI dashboard tracking authorization rates week-over-week</li>
-        <li>Non-value-added steps eliminated via DMAIC root cause analysis</li>
-        <li>200 additional authorizations processed per quarter</li>
-        <li>60 labor hours per month recovered for direct patient care</li>
+        <li>Payment rate improved to 74.9% (+1.3pp) across 57,908 orders</li>
+        <li>251 additional paid claims per month, $64K monthly revenue recovered</li>
+        <li>Average reimbursement per case up $16.96</li>
+        <li>Lead time and STAT scheduling held steady, no operational trade-off</li>
+        <li>Dual-audience Power BI dashboard tracking payment KPIs by location</li>
       </ul>
     </div>
   </div>
@@ -273,7 +273,7 @@
   <p class="section-label">Methodology</p>
   <h2 class="sh">How I Worked Through It</h2>
   <p class="body">I followed the DMAIC structure from the beginning. Before touching any data, I spent time with the clinical and administrative staff who actually lived inside the process every day. Those conversations shaped everything that came after. They flagged things the data alone would never have surfaced, and they helped me understand which metrics actually mattered to the people doing the work versus the ones that looked good in a report.</p>
-  <p class="body">From there I pulled baseline metrics from Epic EHR and built the pre/post KPI framework that became the backbone of the analysis. The measurements tracked authorization conversion rates, processing time, and cost per workflow. Post-implementation, I ran the same checks at 30, 60, and 90 days to confirm the changes held.</p>
+  <p class="body">From there I pulled 94,500 billing records from Epic EHR, engineered scheduling accuracy flags in SQL, and built the before/after KPI framework that became the backbone of the analysis. The measurements tracked insurance payment rate, scheduling accuracy, lead time, and reimbursement per case, all split around the March 1 Work Queue go-live to isolate the system's true impact.</p>
 
   <div class="process-flow">
     <div class="proc-step">
@@ -308,14 +308,15 @@
   </div>
 
   <h2 class="sh" style="margin-top:2rem;">The Gap Analysis</h2>
-  <p class="body">The core of the analytical work was a structured pre/post comparison. It sounds straightforward but getting the baseline right took real care. The numbers below reflect the delta between where things started and where they landed after the workflow changes were implemented and confirmed across three measurement checkpoints.</p>
+  <p class="body">The core of the analytical work was a structured before/after comparison around the March 1 Work Queue go-live. It sounds straightforward but getting the baseline right took real care, especially with volume growing 58% in the After period. The numbers below reflect the delta between the manual DAR scheduling baseline and Work Queue enforcement.</p>
   <table class="tools-table">
-    <thead><tr><th>KPI</th><th>Baseline (Pre)</th><th>Post-Implementation</th><th>Change</th></tr></thead>
+    <thead><tr><th>KPI</th><th>Before WQ</th><th>After WQ</th><th>Change</th></tr></thead>
     <tbody>
-      <tr><td>Patient Volume</td><td class="mono">Baseline</td><td class="mono">+30% increase</td><td style="color:var(--amber); font-weight:700;">▲ 30%</td></tr>
-      <tr><td>Quarterly Authorizations</td><td class="mono">Baseline count</td><td class="mono">+200 additional</td><td style="color:var(--amber); font-weight:700;">▲ 200/qtr</td></tr>
-      <tr><td>Labor Hours (Monthly)</td><td class="mono">Excess manual work</td><td class="mono">60 hrs recovered</td><td style="color:var(--amber); font-weight:700;">▲ 60 hrs/mo</td></tr>
-      <tr><td>Cost per Workflow</td><td class="mono">Baseline cost</td><td class="mono">15% reduction</td><td style="color:var(--amber); font-weight:700;">▼ 15%</td></tr>
+      <tr><td>Insurance Payment Rate</td><td class="mono">73.6%</td><td class="mono">74.9%</td><td style="color:var(--amber); font-weight:700;">▲ +1.3pp</td></tr>
+      <tr><td>Avg Reimbursement per Case</td><td class="mono">$238</td><td class="mono">$255</td><td style="color:var(--amber); font-weight:700;">▲ +$16.96</td></tr>
+      <tr><td>Avg Lead Time</td><td class="mono">18.0 days</td><td class="mono">17.5 days</td><td style="color:var(--amber); font-weight:700;">▼ 0.5 days</td></tr>
+      <tr><td>Scheduling Accuracy</td><td class="mono">76.1%</td><td class="mono">76.8%</td><td style="color:var(--amber); font-weight:700;">▲ +0.7pp</td></tr>
+      <tr><td>Paid Claims</td><td class="mono">Baseline</td><td class="mono">+251 / month</td><td style="color:var(--amber); font-weight:700;">▲ $64K/mo</td></tr>
     </tbody>
   </table>
 </div>
@@ -330,12 +331,12 @@
     <tbody>
       <tr><td class="mono">Epic EHR</td><td>Extracted referral and claims data, analyzed workflow patterns, tracked authorization status across patient records</td></tr>
       <tr><td class="mono">Power BI</td><td>Built dual-audience dashboard (clinical operations vs. administrative leadership) with DAX measures, slicers for Before/After WQ and Routine/STAT priority, and KPI cards tied to gap analysis findings</td></tr>
-      <tr><td class="mono">SQL</td><td>Queried clinical datasets to calculate baseline KPIs, identify patterns in referral delays, and validate post-implementation metrics</td></tr>
+      <tr><td class="mono">SQL</td><td>Queried 94,500 Epic billing records to engineer scheduling accuracy flags, calculate payment and lead time KPIs, and trace denial root causes to scheduling inaccuracies</td></tr>
       <tr><td class="mono">Lean Six Sigma (DMAIC)</td><td>Structured the entire project lifecycle from problem definition through post-implementation control and measurement</td></tr>
-      <tr><td class="mono">Gap Analysis</td><td>Formal pre/post comparison framework applied to authorization conversion rates, volume metrics, and cost data</td></tr>
+      <tr><td class="mono">Gap Analysis</td><td>Formal before/after comparison framework applied to payment rates, reimbursement per case, lead time, and scheduling accuracy around the WQ go-live</td></tr>
       <tr><td class="mono">Stakeholder Interviews</td><td>Clinical staff and administrative stakeholders interviewed to map current-state workflows and identify root causes</td></tr>
       <tr><td class="mono">Process Mapping</td><td>Current and future state workflows documented to identify and eliminate non-value-added steps</td></tr>
-      <tr><td class="mono">KPI Design</td><td>Defined and tracked measurable success metrics tied directly to patient access and operational efficiency outcomes</td></tr>
+      <tr><td class="mono">KPI Design</td><td>Defined and tracked measurable success metrics tied directly to revenue recovery and scheduling compliance outcomes</td></tr>
     </tbody>
   </table>
 </div>
@@ -347,7 +348,7 @@
   <p class="section-label">Key Learnings</p>
   <h2 class="sh">What I Took Away From This</h2>
   <p class="body">The biggest thing this internship taught me is that the hardest part of healthcare analytics is not the querying. It is knowing which questions to ask before you write a single line of SQL. The Define and Measure phases felt slow at the time, but every conversation with clinical staff narrowed my focus in ways the data alone could not. I would have built the wrong dashboard if I had started with the data instead of the people.</p>
-  <p class="body">The other thing that stuck with me was what it felt like when the analysis actually landed. The gap analysis was not just a report that got filed somewhere. It was the specific evidence that convinced leadership to approve the workflow changes. That is a different kind of outcome than producing a clean chart, and it is the kind of work I want to keep doing.</p>
+  <p class="body">The other thing that stuck with me was what it felt like when the analysis actually landed. The gap analysis was not just a report that got filed somewhere. It was the specific evidence that supported expanding the Work Queue rollout across imaging service lines. That is a different kind of outcome than producing a clean chart, and it is the kind of work I want to keep doing.</p>
 
   <div class="skills-highlight">
     <h3>Skills Most Relevant for Business Analyst Roles</h3>
