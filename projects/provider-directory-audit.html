@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Provider Directory Accuracy Audit | Salman Chaudhry</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Mono:wght@400;700&family=Lora:ital,wght@0,400;1,400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --bg:#fffcf2; --surface:#f2ede3; --surface2:#e8e2d6;
+      --border:rgba(64,61,57,0.13);
+      --amber:#eb5e28; --amber-dim:#c44d1e; --amber-glow:rgba(235,94,40,0.08);
+      --dark:#403d39; --text:#252422; --muted:#8a8077;
+      --font-head:'Syne',sans-serif; --font-mono:'Space Mono',monospace;
+      --font-body:'Lora',serif; --max:1100px; --radius:8px;
+    }
+    html { scroll-behavior:smooth; }
+    body { background:var(--bg); color:var(--text); font-family:var(--font-body); font-size:1rem; line-height:1.75; overflow-x:hidden; }
+    ::selection { background:var(--amber); color:#fffcf2; }
+    ::-webkit-scrollbar { width:4px; }
+    ::-webkit-scrollbar-track { background:var(--surface2); }
+    ::-webkit-scrollbar-thumb { background:#ccc5b9; border-radius:2px; }
+    body::before { content:''; position:fixed; inset:0; z-index:0; pointer-events:none; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E"); opacity:.018; }
+
+    .reveal { opacity:0; transform:translateY(22px); transition:opacity .65s cubic-bezier(.4,0,.2,1),transform .65s cubic-bezier(.4,0,.2,1); }
+    .reveal.visible { opacity:1; transform:none; }
+
+    nav { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:1.2rem 3rem; background:rgba(255,252,242,.94); backdrop-filter:blur(20px); border-bottom:1px solid var(--border); }
+    .nav-logo { font-family:var(--font-mono); font-size:.85rem; color:var(--amber); letter-spacing:.08em; text-decoration:none; }
+    .nav-back { font-family:var(--font-mono); font-size:.78rem; letter-spacing:.1em; text-transform:uppercase; color:var(--text); text-decoration:none; transition:color .2s; }
+    .nav-back:hover { color:var(--amber); }
+
+    .hero { padding:9rem 3rem 4rem; max-width:var(--max); margin:0 auto; position:relative; }
+    .hero::before { content:''; position:absolute; top:0; left:0; right:0; height:100%; background:radial-gradient(ellipse 60% 50% at 15% 40%, var(--amber-glow) 0%, transparent 70%); pointer-events:none; z-index:0; }
+    .hero > * { position:relative; z-index:1; }
+    .back-link { font-family:var(--font-mono); font-size:.75rem; letter-spacing:.15em; text-transform:uppercase; color:var(--muted); text-decoration:none; display:inline-flex; align-items:center; gap:.5rem; margin-bottom:2rem; transition:color .2s; }
+    .back-link:hover { color:var(--amber); }
+    .eyebrow { font-family:var(--font-mono); font-size:.75rem; letter-spacing:.2em; text-transform:uppercase; color:var(--dark); margin-bottom:1rem; display:flex; align-items:center; gap:.6rem; }
+    .eyebrow::before { content:''; display:inline-block; width:28px; height:1px; background:var(--dark); }
+    h1 { font-family:var(--font-head); font-size:clamp(2.2rem,5vw,3.8rem); font-weight:800; color:var(--text); line-height:1.05; letter-spacing:-.02em; margin-bottom:1.2rem; }
+    h1 span { color:var(--amber); }
+    .lead { font-size:1.02rem; color:var(--muted); max-width:680px; line-height:1.85; margin-bottom:2.5rem; }
+    .meta-row { display:flex; gap:2rem; flex-wrap:wrap; margin-bottom:2.5rem; }
+    .meta-item .label { font-family:var(--font-mono); font-size:.65rem; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); margin-bottom:.3rem; }
+    .meta-item .value { font-family:var(--font-mono); font-size:.82rem; color:var(--text); }
+    .meta-item .value.amber { color:var(--amber); }
+    .tag-row { display:flex; gap:.5rem; flex-wrap:wrap; }
+    .tag { font-family:var(--font-mono); font-size:.68rem; letter-spacing:.06em; padding:.28rem .7rem; border-radius:4px; background:#fff; border:1px solid var(--border); color:var(--text); box-shadow:0 1px 3px rgba(64,61,57,.05); }
+
+    .section { padding:3.5rem 3rem; max-width:var(--max); margin:0 auto; }
+    .section-label { font-family:var(--font-mono); font-size:.72rem; letter-spacing:.2em; text-transform:uppercase; color:var(--amber); margin-bottom:1.5rem; padding-bottom:.6rem; border-bottom:1px solid var(--border); }
+    hr.div { border:none; border-top:1px solid var(--border); margin:0 3rem; }
+    h2.sh { font-family:var(--font-head); font-size:1.45rem; font-weight:700; color:var(--text); margin-bottom:.8rem; letter-spacing:-.01em; }
+    p.body { font-size:.95rem; color:var(--muted); line-height:1.85; margin-bottom:1rem; }
+
+    .impact-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.2rem; margin-bottom:2.5rem; }
+    .impact-card { background:#fff; border:1px solid var(--border); border-radius:10px; padding:1.6rem; text-align:center; box-shadow:0 2px 8px rgba(64,61,57,.06); transition:transform .2s,box-shadow .2s; }
+    .impact-card:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(64,61,57,.1); }
+    .impact-num { font-family:var(--font-head); font-size:2.4rem; font-weight:800; color:var(--amber); display:block; line-height:1; margin-bottom:.4rem; letter-spacing:-.01em; }
+    .impact-num.dark { color:var(--text); }
+    .impact-label { font-family:var(--font-mono); font-size:.68rem; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
+
+    .shot-card { background:#fff; border:1px solid var(--border); border-radius:10px; overflow:hidden; box-shadow:0 2px 12px rgba(64,61,57,.08); margin-bottom:1.8rem; }
+    .shot-card img { width:100%; display:block; }
+    .shot-caption { font-family:var(--font-mono); font-size:.72rem; letter-spacing:.08em; color:var(--muted); padding:.9rem 1.2rem; border-top:1px solid var(--border); }
+
+    .steps { counter-reset:step; list-style:none; margin-bottom:1.5rem; }
+    .steps li { position:relative; padding:.4rem 0 .4rem 3rem; font-size:.95rem; color:var(--muted); line-height:1.8; }
+    .steps li::before { counter-increment:step; content:counter(step); position:absolute; left:0; top:.55rem; width:2rem; height:2rem; border-radius:50%; background:rgba(235,94,40,.08); border:1px solid rgba(235,94,40,.35); color:var(--amber); font-family:var(--font-mono); font-size:.8rem; display:flex; align-items:center; justify-content:center; }
+
+    .tools-table { width:100%; border-collapse:collapse; font-size:.88rem; margin-bottom:1.5rem; border-radius:8px; overflow:hidden; border:1px solid var(--border); background:#fff; box-shadow:0 1px 4px rgba(64,61,57,.05); }
+    .tools-table th { background:var(--surface); font-family:var(--font-mono); font-size:.68rem; letter-spacing:.1em; text-transform:uppercase; color:var(--amber); padding:.8rem 1rem; text-align:left; border-bottom:1px solid var(--border); }
+    .tools-table td { padding:.75rem 1rem; color:var(--text); border-bottom:1px solid rgba(64,61,57,.06); vertical-align:top; }
+    .tools-table tr:last-child td { border-bottom:none; }
+    .tools-table tr:hover td { background:var(--surface); }
+    .mono { font-family:var(--font-mono); font-size:.78rem; color:var(--amber); font-weight:700; }
+
+    .btn-row { display:flex; gap:1rem; flex-wrap:wrap; margin-top:1.5rem; }
+    .db-btn { font-family:var(--font-mono); font-size:.78rem; letter-spacing:.08em; text-transform:uppercase; padding:.75rem 1.6rem; border-radius:var(--radius); text-decoration:none; transition:transform .15s,box-shadow .15s,border-color .2s,color .2s; }
+    .db-btn-primary { background:var(--amber); color:#fffcf2; }
+    .db-btn-primary:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(235,94,40,.3); }
+    .db-btn-ghost { background:transparent; color:var(--text); border:1px solid rgba(64,61,57,.25); }
+    .db-btn-ghost:hover { border-color:var(--amber); color:var(--amber); }
+
+    .skills-highlight { background:#fff; border:1px solid rgba(235,94,40,.22); border-radius:10px; padding:1.8rem; margin-bottom:2rem; box-shadow:0 2px 8px rgba(64,61,57,.07); }
+    .skills-highlight h3 { font-family:var(--font-head); font-size:1.05rem; font-weight:700; color:var(--amber); margin-bottom:1rem; }
+    .skill-pill-grid { display:flex; flex-wrap:wrap; gap:.6rem; }
+    .skill-pill { font-family:var(--font-mono); font-size:.72rem; letter-spacing:.06em; padding:.4rem .95rem; border-radius:100px; border:1px solid; }
+    .skill-pill.hot { background:rgba(235,94,40,.08); border-color:rgba(235,94,40,.4); color:var(--amber); }
+    .skill-pill.warm { background:var(--surface); border-color:var(--border); color:var(--text); }
+
+    footer { border-top:1px solid var(--border); background:var(--surface2); padding:2rem 3rem; display:flex; justify-content:space-between; align-items:center; font-family:var(--font-mono); font-size:.72rem; color:var(--muted); letter-spacing:.06em; }
+    footer a { color:var(--amber); text-decoration:none; }
+
+    @media(max-width:768px) {
+      nav { padding:1rem 1.5rem; }
+      .hero, .section { padding-left:1.5rem; padding-right:1.5rem; }
+      .impact-grid { grid-template-columns:1fr 1fr; }
+      hr.div { margin:0 1.5rem; }
+      footer { flex-direction:column; gap:.5rem; text-align:center; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="../index.html" class="nav-logo">$ salman.exe</a>
+  <a href="../index.html" class="nav-back">← Back to Portfolio</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <a href="../index.html" class="back-link">← Back to all projects</a>
+  <p class="eyebrow">Payer Compliance Analytics · Personal Project</p>
+  <h1>Provider Directory<br><span>Accuracy Audit</span></h1>
+  <p class="lead">An Excel and Power BI project that reconciles real provider data from the CMS NPPES registry against a simulated member-facing directory to find and quantify data quality discrepancies. CMS national reviews have found that roughly half of directory locations contain at least one inaccuracy, and under the No Surprises Act plans must verify every record within 90 days and correct errors within two business days. This audit simulates exactly that process, then turns the findings into a risk-weighted operational work queue.</p>
+
+  <div class="meta-row">
+    <div class="meta-item"><p class="label">Type</p><p class="value amber">Personal Portfolio Project</p></div>
+    <div class="meta-item"><p class="label">Source Data</p><p class="value">CMS NPPES API · 200 Providers</p></div>
+    <div class="meta-item"><p class="label">Metro Area</p><p class="value">Orlando, FL</p></div>
+    <div class="meta-item"><p class="label">Deliverables</p><p class="value">Excel Audit + 2-Page Power BI Report</p></div>
+    <div class="meta-item"><p class="label">Domain</p><p class="value amber">Payer Compliance · Data Quality</p></div>
+  </div>
+
+  <div class="tag-row">
+    <span class="tag">Excel</span><span class="tag">XLOOKUP</span><span class="tag">Power Query</span>
+    <span class="tag">Power BI</span><span class="tag">DAX</span><span class="tag">NPPES API</span>
+    <span class="tag">No Surprises Act</span><span class="tag">CMS Benchmarks</span><span class="tag">Data Reconciliation</span>
+  </div>
+</div>
+
+<hr class="div" />
+
+<!-- RESULTS -->
+<div class="section reveal">
+  <p class="section-label">Audit Results</p>
+  <div class="impact-grid">
+    <div class="impact-card">
+      <span class="impact-num">200</span>
+      <span class="impact-label">Provider Records Audited</span>
+    </div>
+    <div class="impact-card">
+      <span class="impact-num">36</span>
+      <span class="impact-label">Records Flagged (18%)</span>
+    </div>
+    <div class="impact-card">
+      <span class="impact-num">41</span>
+      <span class="impact-label">Field-Level Errors Found</span>
+    </div>
+    <div class="impact-card">
+      <span class="impact-num dark">82.0%</span>
+      <span class="impact-label">Record-Level Accuracy</span>
+    </div>
+    <div class="impact-card">
+      <span class="impact-num dark">~51%</span>
+      <span class="impact-label">CMS National Benchmark</span>
+    </div>
+    <div class="impact-card">
+      <span class="impact-num">1</span>
+      <span class="impact-label">False In-Network Listing (NSA Exposure)</span>
+    </div>
+  </div>
+</div>
+
+<hr class="div" />
+
+<!-- DASHBOARD -->
+<div class="section reveal">
+  <p class="section-label">The Power BI Report</p>
+  <h2 class="sh">Executive Summary & Operational Work Queue</h2>
+  <p class="body">The report has two audiences. The executive summary answers "how accurate is our directory and how do we compare to the industry" with KPIs, an errors-by-field breakdown, and the inaccuracy rate charted against the CMS national benchmark. The work queue is built for the operations team that has to fix the records: every flagged provider, field-level mismatch highlighting, and a weighted risk score that puts the most dangerous listings on top.</p>
+
+  <div class="shot-card">
+    <img src="../assets/images/pda-exec-summary.png" alt="Executive summary page of the Power BI report" loading="lazy" />
+    <p class="shot-caption">Page 1 — Executive Summary: 82% record accuracy vs the ~51% CMS national benchmark, with phone errors the most common failure, matching CMS audit findings.</p>
+  </div>
+
+  <div class="shot-card">
+    <img src="../assets/images/pda-work-queue.png" alt="Operational work queue page of the Power BI report" loading="lazy" />
+    <p class="shot-caption">Page 2 — Operational Work Queue: 36 flagged records sorted by weighted risk score, field-level slicers, provider type breakdown, and priority tiers.</p>
+  </div>
+
+  <div class="btn-row">
+    <a href="https://github.com/salmanzchaudhry/provider-directory-accuracy-audit" target="_blank" class="db-btn db-btn-primary">↗ View on GitHub</a>
+    <a href="https://github.com/salmanzchaudhry/provider-directory-accuracy-audit/raw/main/Provider_Directory_Audit.xlsx" class="db-btn db-btn-ghost">⬇ Excel Workbook</a>
+    <a href="https://github.com/salmanzchaudhry/provider-directory-accuracy-audit/raw/main/Provider_Directory_Audit.pbix" class="db-btn db-btn-ghost">⬇ Power BI Report</a>
+  </div>
+</div>
+
+<hr class="div" />
+
+<!-- METHODOLOGY -->
+<div class="section reveal">
+  <p class="section-label">Methodology</p>
+  <h2 class="sh">How the Audit Works</h2>
+  <ol class="steps">
+    <li>Pulled 200 individual provider records (NPI-1) from the CMS NPPES API for the Orlando metro area, the official public registry for every healthcare provider in the United States.</li>
+    <li>Created a duplicate dataset representing the member-facing directory and introduced errors into 18% of records across five fields: phone, address, specialty, network status, and patient acceptance, matching the error types CMS finds in its own audits.</li>
+    <li>Matched records between the two tables on NPI using XLOOKUP in Excel, with comparison columns flagging mismatches field by field and conditional formatting highlighting every discrepancy.</li>
+    <li>Rebuilt the reconciliation in Power BI with Power Query merges, then modeled a weighted risk score: network status errors rank highest because a false in-network listing triggers No Surprises Act cost-sharing liability, followed by phone and address errors that block members from reaching care.</li>
+    <li>Delivered the two-page report: an executive summary benchmarked against CMS national findings, and a prioritized work queue for the corrections team.</li>
+  </ol>
+</div>
+
+<hr class="div" />
+
+<!-- TOOLS -->
+<div class="section reveal">
+  <p class="section-label">Tools Used</p>
+  <table class="tools-table">
+    <thead><tr><th>Tool</th><th>How It Was Applied</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">NPPES API</td><td>Source of truth for provider name, specialty, practice address, and phone across 200 Orlando-metro providers</td></tr>
+      <tr><td class="mono">Excel + XLOOKUP</td><td>Record matching on NPI between source and directory tables, field-by-field mismatch flags, conditional formatting, and a formula-driven audit summary</td></tr>
+      <tr><td class="mono">Power Query</td><td>Merged source and directory tables, engineered match-check columns, mismatch counts, priority scores, and provider type groupings</td></tr>
+      <tr><td class="mono">DAX</td><td>Accuracy rate, flagged record and field error measures, priority tier counts, and NSA exposure detection (false in-network listings)</td></tr>
+      <tr><td class="mono">Power BI</td><td>Two-page report with custom brand theme, KPI banner, CMS benchmark comparison, and a conditionally formatted work queue table</td></tr>
+      <tr><td class="mono">Git / GitHub</td><td>Full project version controlled: workbook, report file, documentation, and dashboard previews</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<hr class="div" />
+
+<!-- KEY LEARNINGS -->
+<div class="section reveal">
+  <p class="section-label">Key Learnings</p>
+  <h2 class="sh">What This Project Taught Me</h2>
+  <p class="body">The most valuable insight came from weighting the work queue. My first instinct was to rank errors by which field failed, but the better question was what each error costs. A wrong phone number blocks a member from reaching care. A false in-network listing is different: under the No Surprises Act, the plan must honor in-network cost sharing when a member relies on it, which makes it a financial and compliance liability, not just a data quality issue. Out of 200 records, 199 of the problems were operational noise. One was a legal exposure, and the scoring model puts it at the top of the queue.</p>
+  <p class="body">The project also drove home why reconciliation logic needs verification against known truth. An early version of the Power BI merge double-counted one field and silently missed another, and the dashboard looked perfectly plausible while being wrong. Because the Excel audit provided verified expected numbers, the discrepancy surfaced immediately and traced back to a single miswired comparison column.</p>
+
+  <div class="skills-highlight">
+    <h3>Skills Most Relevant for Business Analyst Roles</h3>
+    <div class="skill-pill-grid">
+      <span class="skill-pill hot">Data Reconciliation</span>
+      <span class="skill-pill hot">Healthcare Compliance (NSA, CMS)</span>
+      <span class="skill-pill hot">Power BI Report Design</span>
+      <span class="skill-pill hot">DAX Measures</span>
+      <span class="skill-pill hot">Power Query / ETL</span>
+      <span class="skill-pill hot">Risk-Based Prioritization</span>
+      <span class="skill-pill warm">API Data Sourcing</span>
+      <span class="skill-pill warm">Excel Auditing (XLOOKUP)</span>
+      <span class="skill-pill warm">Data Quality Benchmarking</span>
+      <span class="skill-pill warm">Data Validation</span>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <span>© 2026 Salman Chaudhry · <a href="../index.html">Back to Portfolio</a></span>
+  <span>NPPES · Excel · Power BI · Payer Compliance</span>
+</footer>
+
+<script>
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('visible'); obs.unobserve(e.target); } });
+  }, { threshold:0.1, rootMargin:'0px 0px -40px 0px' });
+  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
