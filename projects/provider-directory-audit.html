@@ -157,7 +157,7 @@
     </div>
     <div class="impact-card">
       <span class="impact-num dark">~51%</span>
-      <span class="impact-label">CMS National Benchmark</span>
+      <span class="impact-label">CMS Audit Avg (≥1 Inaccuracy)</span>
     </div>
     <div class="impact-card">
       <span class="impact-num">1</span>
@@ -176,7 +176,7 @@
 
   <div class="shot-card">
     <img src="../assets/images/pda-exec-summary.png" alt="Executive summary page of the Power BI report" loading="lazy" />
-    <p class="shot-caption">Page 1 — Executive Summary: 82% record accuracy vs the ~51% CMS national benchmark, with phone errors the most common failure, matching CMS audit findings.</p>
+    <p class="shot-caption">Page 1 — Executive Summary: 82% record accuracy against the ~51% average inaccuracy CMS observed in its national directory audits, with phone errors the most common failure, matching CMS findings.</p>
   </div>
 
   <div class="shot-card">
@@ -202,7 +202,7 @@
     <li>Created a duplicate dataset representing the member-facing directory and introduced errors into 18% of records across five fields: phone, address, specialty, network status, and patient acceptance, matching the error types CMS finds in its own audits.</li>
     <li>Matched records between the two tables on NPI using XLOOKUP in Excel, with comparison columns flagging mismatches field by field and conditional formatting highlighting every discrepancy.</li>
     <li>Rebuilt the reconciliation in Power BI with Power Query merges, then modeled a weighted risk score: network status errors rank highest because a false in-network listing triggers No Surprises Act cost-sharing liability, followed by phone and address errors that block members from reaching care.</li>
-    <li>Delivered the two-page report: an executive summary benchmarked against CMS national findings, and a prioritized work queue for the corrections team.</li>
+    <li>Delivered the two-page report: an executive summary compared against CMS's national audit findings (an observed industry baseline, not a compliance target), and a prioritized work queue for the corrections team.</li>
   </ol>
 </div>
 
